@@ -8,7 +8,7 @@ namespace ForecastFavorApp_IntegrationTest
     [TestClass]
     public class IntegrationTest
     {
-        private IWebDriver _webDriver;
+        private IWebDriver _webDriver; 
 
         [TestInitialize]
         public void Setup()
