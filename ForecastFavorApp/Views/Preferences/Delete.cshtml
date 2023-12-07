@@ -11,11 +11,29 @@
     <h4>Preferences</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NotificationTriggers)
+           <dt class="col-sm-2">
+            Notify on Rain
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NotificationTriggers)
+        <dd class="col-sm-10">
+            @Model.NotifyOnRain ? "Yes" : "No"
+        </dd>
+        <dt class="col-sm-2">
+            Notify on Sun
+        </dt>
+        <dd class="col-sm-10">
+            @Model.NotifyOnSun ? "Yes" : "No"
+        </dd>
+           <dt class="col-sm-2">
+            Notify on Clouds
+        </dt>
+        <dd class="col-sm-10">
+            @Model.NotifyOnClouds ? "Yes" : "No"
+        </dd>
+        <dt class="col-sm-2">
+            Notify on Snow
+        </dt>
+        <dd class="col-sm-10">
+            @Model.NotifyOnSnow ? "Yes" : "No"
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.PreferredLocations)

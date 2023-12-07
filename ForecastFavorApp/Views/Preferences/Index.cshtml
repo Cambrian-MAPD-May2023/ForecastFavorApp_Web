@@ -13,7 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.NotificationTriggers)
+                Notify on Rain
+            </th>
+            <th>
+                Notify on Sun
+            </th>
+            <th>
+                Notify on Clouds
+            </th>
+            <th>
+                Notify on Snow
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PreferredLocations)
@@ -27,8 +36,17 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+             <td>
+                @item.NotifyOnRain ? "Yes" : "No"
+            </td>
             <td>
-                @Html.DisplayFor(modelItem => item.NotificationTriggers)
+                @item.NotifyOnSun ? "Yes" : "No"
+            </td>
+             <td>
+                @item.NotifyOnClouds ? "Yes" : "No"
+            </td>
+            <td>
+                @item.NotifyOnSnow ? "Yes" : "No"
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PreferredLocations)

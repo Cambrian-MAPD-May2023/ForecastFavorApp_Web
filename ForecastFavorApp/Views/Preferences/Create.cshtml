@@ -16,10 +16,21 @@
                 <label asp-for="UserID" class="control-label"></label>
                 <select asp-for="UserID" class ="form-control" asp-items="ViewBag.UserID"></select>
             </div>
+             <div class="form-group">
+                <label asp-for="NotifyOnRain" class="control-label"></label>
+                <input asp-for="NotifyOnRain" type="checkbox" /> Notify on Rain
+            </div>
             <div class="form-group">
-                <label asp-for="NotificationTriggers" class="control-label"></label>
-                <input asp-for="NotificationTriggers" class="form-control" />
-                <span asp-validation-for="NotificationTriggers" class="text-danger"></span>
+                <label asp-for="NotifyOnSun" class="control-label"></label>
+                <input asp-for="NotifyOnSun" type="checkbox" /> Notify on Sun
+            </div>
+              <div class="form-group">
+                <label asp-for="NotifyOnSnow" class="control-label"></label>
+                <input asp-for="NotifyOnSnow" type="checkbox" /> Notify on Snow
+            </div>
+            <div class="form-group">
+                <label asp-for="NotifyOnClouds" class="control-label"></label>
+                <input asp-for="NotifyOnClouds" type="checkbox" /> Notify on Clouds
             </div>
             <div class="form-group">
                 <label asp-for="PreferredLocations" class="control-label"></label>

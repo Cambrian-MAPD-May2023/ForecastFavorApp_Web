@@ -57,7 +57,7 @@ namespace ForecastFavorApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PreferencesID,UserID,NotificationTriggers,PreferredLocations")] Preferences preferences)
+       public async Task<IActionResult> Create([Bind("PreferencesID,UserID,NotifyOnRain,NotifyOnSun,NotifyOnClouds,NotifyOnSnow,PreferredLocations")] Preferences preferences)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace ForecastFavorApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PreferencesID,UserID,NotificationTriggers,PreferredLocations")] Preferences preferences)
+        public async Task<IActionResult> Edit(int id, [Bind("PreferencesID,UserID,NotifyOnRain,NotifyOnSun,NotifyOnClouds,NotifyOnSnow,PreferredLocations")] Preferences preferences)
         {
             if (id != preferences.PreferencesID)
             {

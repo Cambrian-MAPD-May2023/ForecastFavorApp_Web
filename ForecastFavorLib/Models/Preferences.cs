@@ -12,9 +12,12 @@ namespace ForecastFavorLib.Models
     [ForeignKey("User")]
     public int UserID { get; set; }
 
-    [StringLength(500)]
-    public string NotificationTriggers { get; set; }
-
+    // Modify to use boolean flags for weather conditions
+    public bool NotifyOnRain { get; set; }
+    public bool NotifyOnSun { get; set; }
+    public bool NotifyOnClouds { get; set; }
+    public bool NotifyOnSnow { get; set; }
+    
     [StringLength(500)]
     public string PreferredLocations { get; set; }
 
