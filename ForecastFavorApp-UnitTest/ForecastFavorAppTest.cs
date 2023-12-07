@@ -1,6 +1,9 @@
 using Newtonsoft.Json;
 using ForecastFavorLib.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using ForecastFavorApp.Data;
+
 
 namespace ForecastFavorApp_UnitTest
 {
@@ -490,6 +493,53 @@ namespace ForecastFavorApp_UnitTest
             var isValid = Validator.TryValidateObject(weatherHistory, validationContext, validationResults, true);
 
             Assert.IsTrue(isValid, "Validation should pass for valid WeatherHistory");
+        }
+    }
+    // test class for the AppDbContext
+    [TestClass]
+    public class AppDbContextTests
+    {
+        [TestMethod]
+        public void AppDbContext_CanSaveAndRetrieveEntities()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                var user = new User
+                {
+                    UserID = 1,
+                    Username = "Sreenath",
+                    Email = "sreenath.segar@example.com",
+                    Preferences = new Preferences
+                    {
+                        NotifyOnRain = true,
+                        NotifyOnSun = false,
+                        NotifyOnClouds = true,
+                        NotifyOnSnow = false,
+                        PreferredLocations = "Some locations"
+                    },
+                    CalendarEvents = new List<CalendarEvent>(),
+                    WeatherHistories = new List<WeatherHistory>()
+                };
+
+                context.Users.Add(user);
+                context.SaveChanges();
+            }
+            using (var context = new AppDbContext(options))
+            {
+                var savedUser = context.Users.Include(u => u.Preferences).FirstOrDefault(u => u.UserID == 1);
+                Assert.IsNotNull(savedUser);
+                Assert.AreEqual("Sreenath", savedUser.Username);
+                Assert.IsNotNull(savedUser.Preferences);
+                Assert.IsTrue(savedUser.Preferences.NotifyOnRain);
+                Assert.IsFalse(savedUser.Preferences.NotifyOnSun);
+                Assert.IsTrue(savedUser.Preferences.NotifyOnClouds);
+                Assert.IsFalse(savedUser.Preferences.NotifyOnSnow);
+                Assert.AreEqual("Some locations", savedUser.Preferences.PreferredLocations);
+            }
         }
     }
 }
