@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using ForecastFavorLib.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ForecastFavorApp_UnitTest
 {
@@ -392,5 +393,31 @@ namespace ForecastFavorApp_UnitTest
             Assert.AreEqual("City", deserializedLocation.Name);
             Assert.AreEqual("America/New_York", deserializedLocation.TimeZoneId);
         }
+    }
+    // test class for the CalendarEvent
+   [TestClass]
+    public class CalendarEventTests
+    {
+        [TestMethod]
+        public void CalendarEvent_Validation_Success()
+        {
+            var calendarEvent = new CalendarEvent
+            {
+                EventID = 1,
+                UserID = 123,
+                EventTitle = "Sample Event",
+                EventDate = DateTime.Now.Date,
+                EventTime = TimeSpan.FromHours(12),
+                EventLocation = "Sample Location",
+                Notes = "Sample Notes",
+                User = new User {}
+            };
+            var validationContext = new ValidationContext(calendarEvent, null, null);
+            var validationResults = new System.Collections.Generic.List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(calendarEvent, validationContext, validationResults, true);
+
+            Assert.IsTrue(isValid, "Validation should pass for a valid CalendarEvent");
+        }
+
     }
 }
