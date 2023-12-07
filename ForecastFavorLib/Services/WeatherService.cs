@@ -89,5 +89,37 @@ namespace ForecastFavorLib.Services
             // If everything went well, we return the forecast data.
             return forecastResponse;
         }
+
+
+        /// Asynchronously gets a personalized weather condition message for a specified location.
+        public async Task<string> GetWeatherConditionMessageAsync(string location)
+        {
+            // Fetch the current weather data for the specified location.
+            var currentWeather = await GetCurrentWeatherAsync(location);
+            
+            // Check if the current weather condition includes "rain" and return a message for rainy weather.
+            if (currentWeather.Current.Condition.Text.Contains("rain"))
+            {
+                return "It's rainy today. Don't forget to carry an umbrella!";
+            }
+            // Check if the current weather condition includes "Sunny" and return a message for sunny weather.
+            else if (currentWeather.Current.Condition.Text.Contains("Sunny"))
+            {
+                return "It's sunny today. A perfect day for outdoor activities!";
+            }
+            // Check if the current weather condition includes "cloudy" and return a message for cloudy weather.
+            else if (currentWeather.Current.Condition.Text.Contains("cloudy"))
+            {
+                return "It's cloudy today. You might need a light jacket.";
+            }
+            // Check if the current weather condition includes "snow" and return a message for snowy weather.
+            else if (currentWeather.Current.Condition.Text.Contains("snow"))
+            {
+                return "It's snowy today. Stay warm and drive safely!";
+            }
+
+            // Default message for cases where the weather condition is not identified or doesn't match any of the above.
+            return "Current weather condition is not identified.";
+        }
     }
 }

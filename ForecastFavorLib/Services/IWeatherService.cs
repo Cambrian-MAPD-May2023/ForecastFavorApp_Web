@@ -12,5 +12,9 @@ namespace ForecastFavorLib.Services
 
         // This one should get us the weather forecast for a location, for a certain number of days ahead.
         Task<ForecastResponse> GetForecastAsync(string location, int days);
+
+        //Method to fecth a personalized message based on current condition
+        Task<string> GetWeatherConditionMessageAsync(string location);
+
     }
 }
