@@ -16,3 +16,57 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.search-container {
+    margin-bottom: 20px;
+    display: flex;
+}
+
+.search-input {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.current-location {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+
+.current-weather {
+    background-color: #87CEEB; /* Sky Blue */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.weather-icon {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+/* Hourly Forecast Container */
+.hourly-forecast {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.hourly-forecast-item {
+    text-align: center;
+    margin-bottom: 20px
+}
+
