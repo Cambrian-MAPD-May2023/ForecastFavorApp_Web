@@ -445,4 +445,28 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsTrue(isValid, "Validation should pass for valid Preferences");
         }
     }
+    // test class for the User
+    [TestClass]
+    public class UserTests
+    {
+        [TestMethod]
+        public void User_Validation_Success()
+        {
+            var user = new User
+            {
+                UserID = 1,
+                Username = "Sreenath",
+                Email = "sreenath.segar@example.com",
+                Preferences = new Preferences { },
+                CalendarEvents = new List<CalendarEvent> { },
+                WeatherHistories = new List<WeatherHistory> { }
+            };
+            var validationContext = new ValidationContext(user, null, null);
+            var validationResults = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(user, validationContext, validationResults, true);
+
+            Assert.IsTrue(isValid, "Validation should pass for a valid User");
+        }
+    }
+
 }
