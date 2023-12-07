@@ -468,5 +468,28 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsTrue(isValid, "Validation should pass for a valid User");
         }
     }
+    // test class for the WeatherHistory 
+    [TestClass]
+    public class WeatherHistoryTests
+    {
+        [TestMethod]
+        public void WeatherHistory_Validation_Success()
+        {
+            var weatherHistory = new WeatherHistory
+            {
+                HistoryID = 1,
+                UserID = 123,
+                Location = "Sample Location",
+                Date = DateTime.Now.Date,
+                Temperature = 25.5,
+                Precipitation = 15.0,
+                User = new User { }
+            };
+            var validationContext = new ValidationContext(weatherHistory, null, null);
+            var validationResults = new System.Collections.Generic.List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(weatherHistory, validationContext, validationResults, true);
 
+            Assert.IsTrue(isValid, "Validation should pass for valid WeatherHistory");
+        }
+    }
 }
