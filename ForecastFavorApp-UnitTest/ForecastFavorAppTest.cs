@@ -395,7 +395,7 @@ namespace ForecastFavorApp_UnitTest
         }
     }
     // test class for the CalendarEvent
-   [TestClass]
+    [TestClass]
     public class CalendarEventTests
     {
         [TestMethod]
@@ -410,7 +410,7 @@ namespace ForecastFavorApp_UnitTest
                 EventTime = TimeSpan.FromHours(12),
                 EventLocation = "Sample Location",
                 Notes = "Sample Notes",
-                User = new User {}
+                User = new User { }
             };
             var validationContext = new ValidationContext(calendarEvent, null, null);
             var validationResults = new System.Collections.Generic.List<ValidationResult>();
@@ -419,5 +419,30 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsTrue(isValid, "Validation should pass for a valid CalendarEvent");
         }
 
+    }
+    // test class for the Preferences
+    [TestClass]
+    public class PreferencesTests
+    {
+        [TestMethod]
+        public void Preferences_Validation_Success()
+        {
+            var preferences = new Preferences
+            {
+                PreferencesID = 1,
+                UserID = 123,
+                NotifyOnRain = true,
+                NotifyOnSun = false,
+                NotifyOnClouds = true,
+                NotifyOnSnow = false,
+                PreferredLocations = "City1, City2",
+                User = new User { }
+            };
+            var validationContext = new ValidationContext(preferences, null, null);
+            var validationResults = new System.Collections.Generic.List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(preferences, validationContext, validationResults, true);
+
+            Assert.IsTrue(isValid, "Validation should pass for valid Preferences");
+        }
     }
 }
