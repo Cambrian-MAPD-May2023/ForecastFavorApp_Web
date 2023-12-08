@@ -1,25 +1,25 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
 }
 
+/* Search Bar and Current Location Styles */
 .search-container {
     margin-bottom: 20px;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .search-input {
@@ -44,21 +44,41 @@ body {
     margin-bottom: 20px;
     font-size: 18px;
     color: #333;
+    text-align: center;
 }
 
-
+/* Current Weather Card Styles */
 .current-weather {
     background-color: #87CEEB; /* Sky Blue */
     padding: 20px;
     border-radius: 10px;
+    text-align: center;
 }
 
 .weather-icon {
     max-width: 100px;
     max-height: 100px;
+    margin-bottom: 20px;
 }
 
-/* Hourly Forecast Container */
+.weather-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-details,
+.right-details {
+    flex: 1;
+    text-align: left;
+}
+
+    .left-details p,
+    .right-details p {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+/* Hourly Forecast Container Styles */
 .hourly-forecast {
     display: flex;
     justify-content: space-around;
@@ -67,6 +87,32 @@ body {
 
 .hourly-forecast-item {
     text-align: center;
-    margin-bottom: 20px
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.temperature,
+.weather-description,
+.hourly-time {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* Fetch Button Styles */
+.fetch-button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .fetch-button:hover {
+        background-color: #45a049;
+    }
