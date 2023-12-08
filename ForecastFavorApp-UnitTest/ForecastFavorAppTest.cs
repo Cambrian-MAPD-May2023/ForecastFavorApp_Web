@@ -3,6 +3,11 @@ using ForecastFavorLib.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using ForecastFavorApp.Data;
+using ForecastFavorLib.Services;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using RichardSzalay.MockHttp;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace ForecastFavorApp_UnitTest
@@ -573,4 +578,45 @@ namespace ForecastFavorApp_UnitTest
             _context.Dispose();
         }
     }
+    // Test class for Weather Service
+    [TestClass]
+    public class WeatherServiceTests
+    {
+        private WeatherService _weatherService;
+        private Mock<IHttpClientFactory> _httpClientFactoryMock;
+        private Mock<IConfiguration> _configurationMock;
+
+        public WeatherServiceTests()
+        {
+            _configurationMock = new Mock<IConfiguration>();
+            _configurationMock.Setup(x => x["WeatherAPI:ApiKey"]).Returns("sreenath");
+            _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+            var services = new ServiceCollection();
+            services.AddSingleton(_configurationMock.Object);
+            services.AddSingleton(_httpClientFactoryMock.Object);
+            var serviceProvider = services.BuildServiceProvider();
+            _httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() =>
+            {
+                var mockHttp = new MockHttpMessageHandler();
+                mockHttp.When("http://api.weatherapi.com/v1/current.json?key=sreenath&q=Sudbury&aqi=no")
+                    .Respond("application/json", "{'example': 'response'}");
+
+                return new HttpClient(mockHttp);
+            });
+
+            _weatherService = new WeatherService(
+                serviceProvider.GetRequiredService<IHttpClientFactory>(),
+                serviceProvider.GetRequiredService<IConfiguration>()
+            );
+        }
+
+        [TestMethod]
+        public async Task GetCurrentWeatherAsync_ValidLocation_ReturnsCurrentWeatherResponse()
+        {
+            const string location = "Sudbury";
+            var result = await _weatherService.GetCurrentWeatherAsync(location);
+            Assert.IsNotNull(result);
+        }
+    }
+
 }
