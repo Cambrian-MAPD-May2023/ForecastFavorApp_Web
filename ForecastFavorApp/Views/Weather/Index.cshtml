@@ -1,56 +1,156 @@
-@model ForecastFavorLib.Models.CurrentWeatherResponse
+    <link rel="stylesheet" href="~/css/current-weather.css" asp-append-version="true" />
 
-@{
-    ViewData["Title"] = "Current Weather";
-}
+    @* Specify the model that this view expects, which is the CurrentWeatherResponse *@
+    @model ForecastFavorLib.Models.CurrentWeatherResponse
 
-<div class="container mt-5">
-    <!-- Current Location -->
-    <div class="current-location">
-        <p>Current Location: Sudbury, Canada</p>
-        <!-- Button to allow the user to fetch the latest weather data -->
-        <button id="fetchWeatherButton" class="btn btn-success btn-lg mt-3 fetch-button">Fetch Weather</button>
-    </div>
 
-    <!-- Current Weather Card -->
-    <div class="card border-primary mb-3 current-weather">
-        <div class="card-body text-center">
-            <!-- Display city and country in the card title -->
-            <h3 class="card-title mb-4">@Model.Location.Name, @Model.Location.Country</h3>
-            <!-- Weather Details on Left -->
-            <div class="weather-details-left">
-                <p class="card-text"><strong>Temperature:</strong> <i class="fas fa-temperature-low"></i> @Model.Current.TemperatureC °C (@Model.Current.TemperatureF °F)</p>
-                <p class="card-text"><strong>Condition:</strong> <i class="fa fa-cloud"></i> @(Model.Current.Condition?.Text ?? "Not available")</p>
-                <p class="card-text"><strong>Pressure:</strong> @Model.Current.PressureIn inches</p>
-                <p class="card-text"><strong>Humidity:</strong> <i class="fa fa-droplet"></i> @Model.Current.Humidity %</p>
-            </div>
-            <!-- Weather Details on Right -->
-            <div class="weather-details-right">
-                <p class="card-text"><strong>Cloud Cover:</strong> <i class="fa fa-cloud"></i> @Model.Current.Cloud %</p>
-                <p class="card-text"><strong>Feels Like:</strong>@Model.Current.FeelsLikeC °C</p>
-                <p class="card-text"><strong>Wind Speed: </strong> <i class="fa fa-wind"></i> @Model.Current.WindKph kph</p>
-            </div>
+    @{
+        ViewData["Title"] = "Current Weather";
+        var conditionMessage = "Cloudy. Wind up to 15 km/h. High minus 5. Wind chill near minus 12. UV index 1 or low.";
+    }
+    @* Display the current weather heading, indicating the location as Sudbury *@
+    <div class="container mt-5">
+        <div id="cwcNow" style="">
+            <section id="currentWeatherConditionSection">
+                <div id="currentWeatherCondition">
+                    <div id="current-condition-header">
+                        <h1 id="current-condition-location">
+                            @Model.Location.Name,
+                            @Model.Location.Region,
+                            @Model.Location.Country
+                        </h1>
+                        <span id="current-condition-timestamp">
+                            as of @DateTime.Now
+                        </span>
+                    </div>
+
+                    <div id="current-condition-body">
+                        <div id="current-condition-columns">
+                            <div id="current-condition-primary">
+                                <span id ="current-temperature">
+                                    @Model.Current.TemperatureC °C &deg;(@Model.Current.TemperatureF °F)
+                                </span>
+
+                                <div id ="current-condition-text">@Model.Current.Condition.Text
+
+                                </div>
+
+                                <div id ="current-feels-like">
+                                    <span>Feels like @Model.Current.FeelsLikeC &deg;C</span>
+                                </div>
+
+                            </div>
+                            <div>
+                                <img src ="https:@Model.Current.Condition.Icon" />
+                            </div>
+                        </div>
+
+                        <div class="current-condition-messages">
+                            <a href="https://weather.com/travel/video/leaning-tower-in-italy-could-topple-over-officials-fear">@conditionMessage</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
+        @*current weather hourly details*@
+        <div id="cwcDetails">
+            <section>
+                <header>
+                    <h2>
+                        Remaining  Forecast
+                    </h2>
+                </header>
+
+                <div id="cwcDetailHeader">
+                    <div id="todayWeatherCard">
+                        <ul>
+                            <li style="border-width: 0 1px 0 0;
+                                                padding: 0 5px;
+                                                display: flex;
+                                                justify-content: center;
+                                                padding-left: 0;
+                                                border-style: solid;
+                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;
+                                                ">
+
+                                <a href="#">
+                                    <h3>11:00 AM</h3>
+                                    <div><span>25 &deg;</span></div>
+                                    <div><i class="fa fa-sun"></i></div>
+                                    <div><i class="fa fa-snowflake"></i><span>8%</span></div>
+                                </a>
+                            </li>
+                            <li style="
+                                                list-style-type: none;
+                                                border-style: solid;
+                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
+                                <a href="#">
+                                    <h3>01:00 AM</h3>
+                                    <div><span>25 &deg;</span></div>
+                                    <div><i class="fa fa-sun"></i></div>
+                                    <div><i class="fa fa-bolt"></i><span>8%</span></div>
+                                </a>
+                            </li>
+                            <li style="
+                                                list-style-type: none;
+                                                flex-basis: 20%;">
+                                <a href="#">
+                                    <h3>13:00 AM</h3>
+                                    <div><span>25 &deg;</span></div>
+                                    <div><i class="fa fa-sun"></i></div>
+                                    <div><i class="fa fa-wind"></i><span>20%</span></div>
+                                </a>
+                            </li>
+                            <li style="
+                                                list-style-type: none;
+                                                flex-basis: 20%;
+                                                border-style: solid;
+                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
+                                <a href="#">
+                                    <h3>1:00 PM</h3>
+                                    <div><span>25 &deg;</span></div>
+                                    <div><i class="fa fa-sun"></i></div>
+                                    <div><i class="fa fa-moon"></i><span>2%</span></div>
+                                </a>
+                            </li>
+                            <li style="
+                                                list-style-type: none;
+                                                flex-basis: 20%;
+                                                ">
+                                <a href="#">
+                                    <h3>15:00 PM</h3>
+                                    <div><span>25 &deg;</span></div>
+                                    <div><i class="fa fa-sun"></i></div>
+                                    <div><i class="">--</i><span>27%</span></div>
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
 
 
-   
+                <footer id="cwcDetailBody">
+                    <a href="#">Next Hours</a>
+                </footer>
 
-</div>
+            </section>
+        </div>
 
-<script>
-    document.getElementById("fetchWeatherButton").addEventListener("click", function () {
-        // Send a request to the Index action method
-        fetch("/Weather/Index")
-            .then(response => {
-                if (response.ok) {
-                    // Handle a successful response
-                } else {
-                    // Handle error response
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching weather data:", error);
-            });
-    });
-</script>
+
+    <script>document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+            // Send a request to the Index action method
+            fetch("/Weather/Index")
+                .then(response => {
+                    if (response.ok) {
+                        // Handle a successful response
+                    } else {
+                        // Handle error response
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching weather data:", error);
+                });
+        });</script>
+
+
