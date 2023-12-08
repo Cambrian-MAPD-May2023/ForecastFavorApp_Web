@@ -542,4 +542,35 @@ namespace ForecastFavorApp_UnitTest
             }
         }
     }
+    // test class for Migration
+    [TestClass]
+    public class MigrationTests
+    {
+        private AppDbContext _context;
+        private DbContextOptions<AppDbContext> _options;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .Options;
+
+            _context = new AppDbContext(_options);
+        }
+        [TestMethod]
+        public void CanApplyMigration()
+        {
+            _context.Database.EnsureCreated();
+            Assert.IsNotNull(_context.Model.FindEntityType(typeof(User)));
+            Assert.IsNotNull(_context.Model.FindEntityType(typeof(Preferences)));
+            Assert.IsNotNull(_context.Model.FindEntityType(typeof(CalendarEvent)));
+            Assert.IsNotNull(_context.Model.FindEntityType(typeof(WeatherHistory)));
+        }
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            _context.Dispose();
+        }
+    }
 }
