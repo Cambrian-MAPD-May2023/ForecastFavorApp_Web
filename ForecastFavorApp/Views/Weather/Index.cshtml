@@ -5,13 +5,6 @@
 }
 
 <div class="container mt-5">
-
-    <!-- Search Bar -->
-    <div class="search-container">
-        <input class="search-input" type="text" placeholder="Search by city">
-        <button class="search-button">Go</button>
-    </div>
-
     <!-- Current Location -->
     <div class="current-location">
         <p>Current Location: Sudbury, Canada</p>
@@ -24,8 +17,6 @@
         <div class="card-body text-center">
             <!-- Display city and country in the card title -->
             <h3 class="card-title mb-4">@Model.Location.Name, @Model.Location.Country</h3>
-            <!-- Weather Icon/Image -->
-            <img class="weather-icon" src="/images/cloudy.png" alt="Weather Icon">
             <!-- Weather Details on Left -->
             <div class="weather-details-left">
                 <p class="card-text"><strong>Temperature:</strong> <i class="fas fa-temperature-low"></i> @Model.Current.TemperatureC °C (@Model.Current.TemperatureF °F)</p>
@@ -43,16 +34,7 @@
     </div>
 
 
-    <!-- Hourly Forecast Container -->
-    <div class="hourly-forecast">
-        <!-- Hourly Forecast Content -->
-        <div class="hourly-forecast-item">
-            <p class="temperature">25°C</p>
-            <img class="weather-icon" src="/images/partly-cloudy.png" alt="Weather Icon">
-            <p class="weather-description">Partly Cloudy</p>
-            <p class="hourly-time">1 PM</p>
-        </div>
-    </div>
+   
 
 </div>
 
