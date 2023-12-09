@@ -1,156 +1,209 @@
-    <link rel="stylesheet" href="~/css/current-weather.css" asp-append-version="true" />
+@*<link rel="stylesheet" href="~/css/current-weather.css" asp-append-version="true" /> *@
 
-    @* Specify the model that this view expects, which is the CurrentWeatherResponse *@
-    @model ForecastFavorLib.Models.CurrentWeatherResponse
+@* Specify the model that this view expects, which is the CurrentWeatherResponse *@
+@*@model ForecastFavorLib.Models.CurrentWeatherResponse*@
+@model ForecastFavorLib.Models.APIModels.CurrentLocationForecastResponse
 
+@{
+    ViewData["Title"] = "Current Weather";
+    var conditionMessage = "Feels like " + Model.Current.FeelsLikeC + " C. " + "Wind is " + Model.Current.WindKph + " kph. " + "Cloud coverage of " + Model.Current.Cloud + ".";
 
-    @{
-        ViewData["Title"] = "Current Weather";
-        var conditionMessage = "Cloudy. Wind up to 15 km/h. High minus 5. Wind chill near minus 12. UV index 1 or low.";
-    }
-    @* Display the current weather heading, indicating the location as Sudbury *@
-    <div class="container mt-5">
-        <div id="cwcNow" style="">
-            <section id="currentWeatherConditionSection">
-                <div id="currentWeatherCondition">
-                    <div id="current-condition-header">
-                        <h1 id="current-condition-location">
-                            @Model.Location.Name,
-                            @Model.Location.Region,
-                            @Model.Location.Country
-                        </h1>
-                        <span id="current-condition-timestamp">
-                            as of @DateTime.Now
-                        </span>
-                    </div>
+    var location = string.Concat(Model.Location.Name, ", ", Model.Location.Region, ", ", Model.Location.Country);
+    var astros = Model.Forecast.ForecastDay.First();
+    var sunrise = astros.Astros.Sunrise;
+    var sunset = astros.Astros.Sunset;
+}
 
-                    <div id="current-condition-body">
-                        <div id="current-condition-columns">
-                            <div id="current-condition-primary">
-                                <span id ="current-temperature">
-                                    @Model.Current.TemperatureC °C &deg;(@Model.Current.TemperatureF °F)
-                                </span>
+@* Display the current weather heading, indicating the location as Sudbury *@
+<div class="container mt-5">
+    <div id="cwcNow" style="margin-bottom:12px;">
+        <section id="currentWeatherCondition"
+                 style="background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);box-shadow: 0 0 12px 0 rgba(0,0,0,.2);border-radius: 20px;">
 
-                                <div id ="current-condition-text">@Model.Current.Condition.Text
-
-                                </div>
-
-                                <div id ="current-feels-like">
-                                    <span>Feels like @Model.Current.FeelsLikeC &deg;C</span>
-                                </div>
-
-                            </div>
-                            <div>
-                                <img src ="https:@Model.Current.Condition.Icon" />
-                            </div>
-                        </div>
-
-                        <div class="current-condition-messages">
-                            <a href="https://weather.com/travel/video/leaning-tower-in-italy-could-topple-over-officials-fear">@conditionMessage</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        @*current weather hourly details*@
-        <div id="cwcDetails">
-            <section>
-                <header>
-                    <h2>
-                        Remaining  Forecast
-                    </h2>
-                </header>
-
-                <div id="cwcDetailHeader">
-                    <div id="todayWeatherCard">
-                        <ul>
-                            <li style="border-width: 0 1px 0 0;
-                                                padding: 0 5px;
-                                                display: flex;
-                                                justify-content: center;
-                                                padding-left: 0;
-                                                border-style: solid;
-                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;
-                                                ">
-
-                                <a href="#">
-                                    <h3>11:00 AM</h3>
-                                    <div><span>25 &deg;</span></div>
-                                    <div><i class="fa fa-sun"></i></div>
-                                    <div><i class="fa fa-snowflake"></i><span>8%</span></div>
-                                </a>
-                            </li>
-                            <li style="
-                                                list-style-type: none;
-                                                border-style: solid;
-                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
-                                <a href="#">
-                                    <h3>01:00 AM</h3>
-                                    <div><span>25 &deg;</span></div>
-                                    <div><i class="fa fa-sun"></i></div>
-                                    <div><i class="fa fa-bolt"></i><span>8%</span></div>
-                                </a>
-                            </li>
-                            <li style="
-                                                list-style-type: none;
-                                                flex-basis: 20%;">
-                                <a href="#">
-                                    <h3>13:00 AM</h3>
-                                    <div><span>25 &deg;</span></div>
-                                    <div><i class="fa fa-sun"></i></div>
-                                    <div><i class="fa fa-wind"></i><span>20%</span></div>
-                                </a>
-                            </li>
-                            <li style="
-                                                list-style-type: none;
-                                                flex-basis: 20%;
-                                                border-style: solid;
-                                                border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
-                                <a href="#">
-                                    <h3>1:00 PM</h3>
-                                    <div><span>25 &deg;</span></div>
-                                    <div><i class="fa fa-sun"></i></div>
-                                    <div><i class="fa fa-moon"></i><span>2%</span></div>
-                                </a>
-                            </li>
-                            <li style="
-                                                list-style-type: none;
-                                                flex-basis: 20%;
-                                                ">
-                                <a href="#">
-                                    <h3>15:00 PM</h3>
-                                    <div><span>25 &deg;</span></div>
-                                    <div><i class="fa fa-sun"></i></div>
-                                    <div><i class="">--</i><span>27%</span></div>
-                                </a>
-                            </li>
-                        </ul>
-
-                    </div>
+            <div id="currentWeatherCondition" style=" border-radius: 20px;">
+                <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
+                    <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@location</h1>
+                    <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
+                        As of @DateTime.Now
+                    </span>
                 </div>
 
+                <div id="current-condition-body" style="border-radius:0 0 20px 20px; padding: 10px 16px;">
+                    <div id="current-condition-columns" style="display: flex;justify-content: space-between;">
+                        <div id="current-condition-primary" style="text-align: left; color:white;">
 
-                <footer id="cwcDetailBody">
-                    <a href="#">Next Hours</a>
-                </footer>
+                            <span style="font-size: 4rem;line-height: 1;font-weight: 500;display: block;position: relative;">@Model.Current.TemperatureC&deg;C</span>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span> @Model.Current.Condition.Text</span></div>
+                            <div style=" line-height: 1.1;font-size: 1.0rem;font-weight: 700;margin-top: 5px;">
+                                @if (Model.Current.IsDay.Equals("0"))
+                                {
+                                    <span>Good Evening! </span> <i class="fa-solid fa-champagne-glasses"></i>
+                                }
+                                else
+                                {
+                                    <span>Good Morning!</span> <i class="fa-solid fa-mug-saucer"></i>
+                                }
+                            </div>
 
-            </section>
-        </div>
+                        </div>
+                        <div id="current-condition-secondary" style="color:white;">
+                            <img src="https:@Model.Current.Condition.Icon" />
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span>Sunrise @@ @sunrise</span></div>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span>Sunset @@ @sunset</span></div>
+                        </div>
+                    </div>
+
+                    <div class="current-condition-messages" style="flex-flow: row wrap;display: flex;justify-content: space-between;background-color: #5e5263; border-radius: 5px;margin-top: 10px;">
+                        <a href="https://weather.com/travel/video/leaning-tower-in-italy-could-topple-over-officials-fear" style="padding: 6px 10px; flex-basis: content;flex-grow: 1;text-decoration:none;color:white;text-align:center;"> @conditionMessage </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <script>document.getElementById("fetchWeatherButton").addEventListener("click", function () {
-            // Send a request to the Index action method
-            fetch("/Weather/Index")
-                .then(response => {
-                    if (response.ok) {
-                        // Handle a successful response
-                    } else {
-                        // Handle error response
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching weather data:", error);
-                });
-        });</script>
+    @*current weather hourly details*@
+    <div id="cwcDetails" style="
+                                margin-bottom: 12px;
+                                grid-auto-rows: max-content;
+                                width: 100%;
+                                grid-column: span 12;
+                                grid-template-columns: minmax(0,1fr) 350px;
+                                grid-column-gap: 12px;
+                                max-width: 1162px;
+">
+        <section style="
+                            box-sizing: border-box;
+                            border-radius: 6px;
+                            box-shadow: 0 0 12px 0 rgba(0,0,0,.2);
+                            background-color: #bb77df52;
+                            width: 100%;
+                            container-type: inline-size;
+                            container-name: card;
+                            margin: 0 !important;
+                            padding-right: 0px;
+                ">
 
+            <header style="padding: 16px;display: block;position: relative;padding: 10px 16px;
+background-color: #5e5263;
+border-radius: 20px 20px 0 0;">
+                <h2 style="display: flex;
+                                align-items: center;
+                                font-weight: 600;
+                                line-height: 1.2;
+                                color: #2b2b2b;
+                                font-size: 1.25rem !important;color: white;">
+                    Remaining  Forecast
+                </h2>
+            </header>
+
+            <div id="cwcDetailHeader">
+                <div id="todayWeatherCard" style="text-align: center;">
+                    <ul style="margin-top: 0;box-sizing: border-box;   border: 2px solid yellow;
+                                    text-align: center;
+                                   border-width: 0px;
+                                    padding: 0 5px;
+                                    border-style: solid;
+                                    display: flex;
+                                    flex-basis: 20%;
+                                    justify-content: center;
+                                    list-style-type: none;">
+                        <li style="border-width: 0 1px 0 0;
+                                        padding: 0 5px;
+                                        display: flex;
+                                        flex-basis: 20%;
+                                        justify-content: center;
+                                        padding-left: 0;
+                                        flex-basis: 20%;
+                                        border-style: solid;
+                                        border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
+
+                            <a href="#">
+                                <h3>11:00 AM</h3>
+                                <div><span>25 &deg;</span></div>
+                                <div><i class="fa fa-sun"></i></div>
+                                <div><i class="fa fa-snowflake"></i><span>8%</span></div>
+                            </a>
+                        </li>
+                        <li style="text-align: center;
+                                        list-style-type: none;
+                                        flex-basis: 20%;
+                                        border-style: solid;
+                                        border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
+                            <a href="#">
+                                <h3>01:00 AM</h3>
+                                <div><span>25 &deg;</span></div>
+                                <div><i class="fa fa-sun"></i></div>
+                                <div><i class="fa fa-bolt"></i><span>8%</span></div>
+                            </a>
+                        </li>
+                        <li style="text-align: center;
+                                        list-style-type: none;
+                                        flex-basis: 20%;">
+                            <a href="#">
+                                <h3>13:00 AM</h3>
+                                <div><span>25 &deg;</span></div>
+                                <div><i class="fa fa-sun"></i></div>
+                                <div><i class="fa fa-wind"></i><span>20%</span></div>
+                            </a>
+                        </li>
+                        <li style="text-align: center;
+                                        list-style-type: none;
+                                        flex-basis: 20%;
+                                        border-style: solid;
+                                        border-image: linear-gradient(180deg,hsla(0,0%,87.1%,0) 0,#dedede 25%,#dedede 70%,hsla(0,0%,87.1%,0) 85%,hsla(0,0%,87.1%,0)) 1 100%;">
+                            <a href="#">
+                                <h3>1:00 PM</h3>
+                                <div><span>25 &deg;</span></div>
+                                <div><i class="fa fa-sun"></i></div>
+                                <div><i class="fa fa-moon"></i><span>2%</span></div>
+                            </a>
+                        </li>
+                        <li style="text-align: center;
+                                        list-style-type: none;
+                                        flex-basis: 20%;
+                                        ">
+                            <a href="#">
+                                <h3>15:00 PM</h3>
+                                <div><span>25 &deg;</span></div>
+                                <div><i class="fa fa-sun"></i></div>
+                                <div><i class="">--</i><span>27%</span></div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <footer id="cwcDetailBody"
+                    style="  padding: 0 16px 11px 11px;
+                              display: flex;
+                              flex-flow: row nowrap;
+                              align-items: center;
+                              line-height: 1.5;
+}">
+                <a href="#">Next Hours</a>
+            </footer>
+
+        </section>
+    </div>
+
+    @* Button to allow the user to fetch the latest weather data *@
+    <button id="fetchWeatherButton" class="btn btn-success btn-lg mt-3">Fetch Weather</button>
+</div>
+
+
+<script>document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+        // Send a request to the Index action method
+        fetch("/Weather/Index")
+            .then(response => {
+                if (response.ok) {
+                    // Handle a successful response
+                } else {
+                    // Handle error response
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching weather data:", error);
+            });
+    });</script>
 
