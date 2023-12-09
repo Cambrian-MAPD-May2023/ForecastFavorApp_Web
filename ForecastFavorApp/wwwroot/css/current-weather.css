@@ -1,5 +1,4 @@
 ﻿#cwcNow {
-    
     margin-bottom: 12px;
 }
 
@@ -43,8 +42,9 @@
 }
 
 #current-condition-primary {
-   text-align: left;
-   color:white;
+    text-align: left;
+    color: white;
+    border: 1px solid yellow;
 }
 
 #current-temperature {
@@ -59,6 +59,7 @@
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1.1;
+    border: 1px solid green;
 }
 
 #current-feels-like {
@@ -94,8 +95,8 @@
     grid-column: span 12;
     grid-template-columns: minmax(0,1fr) 350px;
     grid-column-gap: 12px;
+    max-width: 1162px;
 }
-
 
     #cwcDetails > section {
         box-sizing: border-box;
@@ -109,24 +110,24 @@
         padding-right: 0px;
     }
 
-    #cwcDetails > section > header {
-        padding: 16px;
-        display: block;
-        position: relative;
-        padding: 10px 16px;
-        background-color: #5e5263;
-        border-radius: 20px 20px 0 0;
-    }
-
-        #cwcDetails > section > header > h2 {
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            line-height: 1.2;
-            color: #2b2b2b;
-            font-size: 1.25rem !important;
-            color: white;
+        #cwcDetails > section > header {
+            padding: 16px;
+            display: block;
+            position: relative;
+            padding: 10px 16px;
+            background-color: #5e5263;
+            border-radius: 20px 20px 0 0;
         }
+
+            #cwcDetails > section > header > h2 {
+                display: flex;
+                align-items: center;
+                font-weight: 600;
+                line-height: 1.2;
+                color: #2b2b2b;
+                font-size: 1.25rem !important;
+                color: white;
+            }
 
 #todayWeatherCard {
     text-align: center;
