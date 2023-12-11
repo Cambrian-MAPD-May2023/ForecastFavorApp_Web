@@ -21,8 +21,11 @@ namespace ForecastFavorApp.Controllers
         // The main page of our weather section
         public async Task<IActionResult> Index()
         {
-            // Ask the weather service for the weather in London and wait for it to come back
-            var currentWeather = await _weatherService.GetCurrentWeatherAsync("Sudbury");
+            var location = "Sudbury"; 
+            var currentWeather = await _weatherService.GetCurrentWeatherAsync(location);
+            
+            // Check and potentially send a notification
+            await _weatherService.GetWeatherConditionMessageAsync(location);
             
             // Send the weather data to our page to be displayed
             return View(currentWeather);
