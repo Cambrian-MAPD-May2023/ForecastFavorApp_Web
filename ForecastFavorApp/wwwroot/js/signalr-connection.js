@@ -11,6 +11,29 @@ connection.start().catch(function (err) {
 
 // Set up an event listener for receiving notifications from the server
 connection.on("ReceiveNotification", function (message) {
-    // Code to execute when a notification is received
-    alert(message); // Display the notification message using an alert (for demonstration purposes)
+    // Check if browser notifications are supported
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+    }
+    // Check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+        // If it's okay, create a notification
+        new Notification("ForecastFavor App", {
+            body: message,
+            icon: "/images/forecastfavor_icon.png"  
+        });
+    }
+    // Otherwise, ask the user for permission
+    else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                new Notification("ForecastFavor App", {
+                    body: message,
+                    icon: "/images/forecastfavor_icon.png" 
+                });
+            }
+        });
+    }
+    
 });
