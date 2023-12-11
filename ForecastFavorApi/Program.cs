@@ -1,4 +1,4 @@
-using ForecastFavorApp.Data;
+using ForecastFavorLib.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ForecastFavorLib.Models;
 
-namespace ForecastFavorApp.Data
+namespace ForecastFavorLib.Data
 {
     public class AppDbContext : DbContext
     {
