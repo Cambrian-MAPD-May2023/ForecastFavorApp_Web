@@ -24,12 +24,38 @@
             <p><strong>Average Humidity:</strong> @Model.Day.AvgHumidity %</p>
             <p><strong>Chance of Rain:</strong> @Model.Day.DailyChanceOfRain %</p>
             <p><strong>Chance of Snow:</strong> @Model.Day.DailyChanceOfSnow %</p>
+            <button id="readTomorrowForecastButton" class="btn btn-info btn-lg mt-3">Read Forecast Aloud</button>
         </div>
-        </div>
+    </div>
 
-            }
-            else
-            {
-            // Display a message if the forecast data for tomorrow is unavailable
-            <p>Forecast data for tomorrow is not available at the moment.</p>
-            }
+}
+else
+{
+// Display a message if the forecast data for tomorrow is unavailable
+<p>Forecast data for tomorrow is not available at the moment.</p>
+}
+
+<script>
+    document.getElementById("readTomorrowForecastButton").addEventListener("click", function () {
+        // Extracting model data into JavaScript variables
+        var maxTempC = '@Model.Day.MaxTempC';
+        var conditionText = '@Model.Day.Condition.Text';
+
+        // Construct the forecast text to be read
+        var forecastText = `The maximum temperature tomorrow will be ${maxTempC} degrees Celsius. 
+                            The condition is expected to be ${conditionText}.`;
+
+        // Call the speak function 
+        speak(forecastText);
+    });
+
+    function speak(text) {
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = text;
+        speech.lang = 'en-US'; 
+        speech.pitch = 1;
+        speech.rate = 1;
+        window.speechSynthesis.speak(speech);
+    }
+</script>
+
