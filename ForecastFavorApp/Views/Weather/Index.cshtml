@@ -10,6 +10,8 @@
         <p>Current Location: Sudbury, Canada</p>
         <!-- Button to allow the user to fetch the latest weather data -->
         <button id="fetchWeatherButton" class="btn btn-success btn-lg mt-3 fetch-button">Fetch Weather</button>
+        <!-- Button to trigger text-to-speech -->
+        <button id="readWeatherButton" class="btn btn-info btn-lg mt-3">Read Weather Aloud</button>
     </div>
 
     <!-- Current Weather Card -->
@@ -53,4 +55,25 @@
                 console.error("Error fetching weather data:", error);
             });
     });
+
+    document.getElementById("readWeatherButton").addEventListener("click", function () {
+        // Function to trigger text-to-speech
+       var temperatureC = '@Model.Current.TemperatureC';
+        var conditionText = '@(Model.Current.Condition?.Text ?? "not available")';
+
+        var weatherText = `Current temperature is ${temperatureC} degrees Celsius. 
+                        The weather condition is ${conditionText}.`;
+
+        speak(weatherText);
+    });
+
+    function speak(text) {
+    const speech = new SpeechSynthesisUtterance();
+    speech.text = text;
+    speech.lang = 'en-US'; // Set the language to English
+    speech.pitch = 1;
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
+}
+
 </script>
