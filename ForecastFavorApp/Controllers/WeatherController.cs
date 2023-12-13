@@ -19,20 +19,42 @@ namespace ForecastFavorApp.Controllers
         }
 
         // The main page of our weather section
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string city)
         {
+
             // Ask the weather service for the weather in London and wait for it to come back
             //var currentWeather = await _weatherService.GetCurrentWeatherAsync("Sudbury");
             var currentWeather = await _weatherService.GetCurrentLocationForecastAsync("Sudbury");
 
             // Send the weather data to our page to be displayed
+
+             if (string.IsNullOrWhiteSpace(city))
+            {
+                // No city is provided, use the default city
+                city = "Sudbury";
+            }
+
+           // var currentWeather = await _weatherService.GetCurrentWeatherAsync(city);
+
+            // Check and potentially send a notification
+            await _weatherService.GetWeatherConditionMessageAsync(city);
+
+            // Send the weather data to the view to be displayed
+
             return View(currentWeather);
         }
 
-        public async Task<IActionResult> Tomorrow()
+
+       public async Task<IActionResult> Tomorrow(string city)
         {
-            // Fetch the forecast for the next 2 days including today.
-            var forecast = await _weatherService.GetForecastAsync("Sudbury", 2);
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                // No city is provided, use the default city
+                city = "Sudbury";
+            }
+
+            // Fetch the forecast for the next 2 days including today for the specified city.
+            var forecast = await _weatherService.GetForecastAsync(city, 2);
 
             // Select the forecast for tomorrow which should be the second element of the forecastday array.
             var tomorrowForecast = forecast.Forecast.ForecastDay.ElementAtOrDefault(1);
@@ -41,12 +63,13 @@ namespace ForecastFavorApp.Controllers
             if (tomorrowForecast == null)
             {
                 // Handle the case where tomorrow's forecast is not available.
-                return View("Error"); 
+                return View("Error");
             }
 
             // Pass the forecast for tomorrow to the view.
             return View(tomorrowForecast);
         }
+
 
 
     }

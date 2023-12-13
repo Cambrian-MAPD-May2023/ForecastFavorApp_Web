@@ -16,6 +16,7 @@
 
 @* Display the current weather heading, indicating the location as Sudbury *@
 <div class="container mt-5">
+
     <div id="cwcNow" style="margin-bottom:12px;">
         <section id="currentWeatherCondition"
                  style="background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);box-shadow: 0 0 12px 0 rgba(0,0,0,.2);border-radius: 20px;">
@@ -59,6 +60,22 @@
                 </div>
             </div>
         </section>
+
+    <!-- Speech Recognition -->
+    <div class="speech-recognition mt-3">
+        <p>Ask for weather in a city:</p>
+        <input type="text" id="speechInput" class="form-control" placeholder="Enter a city name" />
+        <button id="startRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
+    </div>
+
+
+
+    <!-- Current Location -->
+    <div class="current-location">
+        <p>Current Location: @Model.Location.Name, @Model.Location.Country</p>
+        <!-- Button to trigger text-to-speech -->
+        <button id="readWeatherButton" class="btn btn-info btn-lg mt-3">Read Weather Aloud</button>
+
     </div>
 
     @*current weather hourly details*@
@@ -187,6 +204,7 @@ border-radius: 20px 20px 0 0;">
         </section>
     </div>
 
+
     @* Button to allow the user to fetch the latest weather data *@
     <button id="fetchWeatherButton" class="btn btn-success btn-lg mt-3">Fetch Weather</button>
 </div>
@@ -206,4 +224,80 @@ border-radius: 20px 20px 0 0;">
                 console.error("Error fetching weather data:", error);
             });
     });</script>
+
+
+</div>
+
+
+<script>
+    // Declare a variable to hold the speech recognition object
+    let recognition;
+    
+    // Get references to HTML elements by their IDs
+    const speechInput = document.getElementById("speechInput");
+    const startRecognition = document.getElementById("startRecognition");
+
+    // Add a click event listener to the "Start Recognition" button
+    startRecognition.addEventListener("click", () => {
+        // Check if the recognition object is not already initialized
+        if (!recognition) {
+            // Create a new webkitSpeechRecognition object
+            recognition = new webkitSpeechRecognition();
+
+            // Define a callback function to handle recognition results
+            recognition.onresult = (event) => {
+                // Get the recognized speech result
+                const result = event.results[0][0].transcript;
+                
+                // Set the recognized result as the value of the input field
+                speechInput.value = result;
+                
+                // Call a function to fetch current weather for the recognized city
+                fetchCurrentWeather(result);
+            };
+        }
+
+        // Start the speech recognition
+        recognition.start();
+    });
+
+    // Add a click event listener to the "Read Weather" button
+    document.getElementById("readWeatherButton").addEventListener("click", function () {
+        // Extract model data into JavaScript variables (assumes this is Razor syntax)
+        var temperatureC = '@Model.Current.TemperatureC';
+        var conditionText = '@(Model.Current.Condition?.Text ?? "not available")';
+
+        // Construct the weather text to be read
+        var weatherText = `Current temperature is ${temperatureC} degrees Celsius. 
+                        The weather condition is ${conditionText}.`;
+
+        // Call the speak function to read the weather text aloud
+        speak(weatherText);
+    });
+
+    // Function to fetch current weather for a given city
+    function fetchCurrentWeather(city) {
+        // Redirect to the Weather/Index action with the user's input as a query parameter
+        window.location.href = `/Weather/Index?city=${city}`;
+    }
+
+    // Function to speak the provided text
+    function speak(text) {
+        // Create a SpeechSynthesisUtterance object
+        const speech = new SpeechSynthesisUtterance();
+        
+        // Set the text to be spoken
+        speech.text = text;
+        
+        // Set the language for speech synthesis (English - US)
+        speech.lang = 'en-US'; 
+        
+        // Set the pitch and rate of speech
+        speech.pitch = 1;
+        speech.rate = 1;
+        
+        // Start the speech synthesis
+        window.speechSynthesis.speak(speech);
+    }
+</script>
 

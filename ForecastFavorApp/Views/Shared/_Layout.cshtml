@@ -10,6 +10,8 @@
     <!-- Include FontAwesome -->
     <!-- Use FontAwesome 5.15.3 for more features and icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+   
+
 </head>
 <body>
     <header>
@@ -52,6 +54,11 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Include the SignalR JavaScript client library -->
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <!-- Include the custom JavaScript file for establishing and managing the SignalR connection -->
+    <script src="~/js/signalr-connection.js"></script>
 
 
 </body>

@@ -11,6 +11,8 @@ namespace ForecastFavorLib.Services
         // This method should get us the current weather for a given location.
         Task<CurrentWeatherResponse> GetCurrentWeatherAsync(string location);
 
+        Task<string> GetWeatherConditionMessageAsync(string location);
+
         // This one should get us the weather forecast for a location, for a certain number of days ahead.
         Task<ForecastResponse> GetForecastAsync(string location, int days);
 

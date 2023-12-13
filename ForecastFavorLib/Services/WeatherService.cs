@@ -1,10 +1,13 @@
 using ForecastFavorLib.Models;
+using ForecastFavorLib.Data;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using ForecastFavorLib.Models.APIModels;
+using Microsoft.EntityFrameworkCore;
 
 
 // Our services go in this namespace.
@@ -19,13 +22,23 @@ namespace ForecastFavorLib.Services
         private readonly string _apiKey;
 
         // When we make a new WeatherService, we need to give it an HttpClient and an API key.
+
         public WeatherService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
-        {
+        { }
             // Create a new HttpClient using the factory
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly AppDbContext _context;
+
+        public WeatherService(IHttpClientFactory httpClientFactory, IConfiguration configuration
+            , IHubContext<NotificationHub> notificationHub
+            , AppDbContext context)
+        {
             _httpClient = httpClientFactory.CreateClient();
-            // Retrieve the API key from IConfiguration 
             _apiKey = configuration["WeatherAPI:ApiKey"] ?? throw new InvalidOperationException("API key not found in configuration");
+           _notificationHub = notificationHub;
+            _context = context;
         }
+
 
         // This method gets the current weather for a specific place.
         public async Task<CurrentWeatherResponse> GetCurrentWeatherAsync(string location)
@@ -123,7 +136,103 @@ namespace ForecastFavorLib.Services
 
             // If everything went well, we return the forecast data.
             return forecastResponse;
+        }
 
+        /// Asynchronously gets a personalized weather condition message for a specified location.
+       public async Task<string> GetWeatherConditionMessageAsync(string location)
+        {
+            // Retrieve the current weather conditions for the given location
+            var currentWeather = await GetCurrentWeatherAsync(location);
+
+            // Determine the weather condition message based on the current weather conditions
+            var conditionMessage = DetermineConditionMessage(currentWeather.Current.Condition.Text);
+
+            // Fetch the default user
+            var defaultUser = _context.Users.Include(u => u.Preferences).FirstOrDefault(u => u.UserID == 1);
+
+            // Check if the default user should be notified
+            if (defaultUser != null && ShouldNotifyUser(defaultUser, currentWeather.Current.Condition.Text))
+            {
+                // Send a notification to the default user via SignalR
+                await _notificationHub.Clients.All.SendAsync("ReceiveNotification", conditionMessage);
+            }
+
+            return conditionMessage;
+        }
+
+
+        // Determine the appropriate weather condition message based on the condition text
+        private string DetermineConditionMessage(string conditionText)
+        {
+            if (string.IsNullOrWhiteSpace(conditionText))
+            {
+                return "Weather condition is not available.";
+            }
+
+            if (conditionText.Contains("rain", StringComparison.OrdinalIgnoreCase))
+            {
+                return "It's rainy today. Don't forget to carry an umbrella!";
+            }
+            else if (conditionText.Contains("sunny", StringComparison.OrdinalIgnoreCase))
+            {
+                return "It's sunny today. A perfect day for outdoor activities!";
+            }
+            else if (conditionText.Contains("cloudy", StringComparison.OrdinalIgnoreCase))
+            {
+                return "It's cloudy today. You might need a light jacket.";
+            }
+            else if (conditionText.Contains("snow", StringComparison.OrdinalIgnoreCase))
+            {
+                return "It's snowy today. Stay warm and drive safely!";
+            }
+            else
+            {
+                // Default message for conditions that are not explicitly handled above
+                return $"The weather is {conditionText} today.";
+            }
+        }
+
+        // Determine if a user should be notified based on their preferences and the weather condition
+        private bool ShouldNotifyUser(User user, string conditionText)
+        {
+            // Ensure conditionText is valid
+            if (string.IsNullOrWhiteSpace(conditionText))
+            {
+                return false;
+            }
+
+            // Ensure user has preferences set
+            if (user.Preferences == null)
+            {
+                return false;
+            }
+
+            // Check for rain condition
+            if (conditionText.Contains("rain", StringComparison.OrdinalIgnoreCase) && user.Preferences.NotifyOnRain)
+            {
+                return true;
+            }
+
+            // Check for sunny condition
+            if (conditionText.Contains("sunny", StringComparison.OrdinalIgnoreCase) && user.Preferences.NotifyOnSun)
+            {
+                return true;
+            }
+
+            // Check for cloudy condition
+            if (conditionText.Contains("cloudy", StringComparison.OrdinalIgnoreCase) && user.Preferences.NotifyOnClouds)
+            {
+                return true;
+            }
+
+            // Check for snow condition
+            if (conditionText.Contains("snow", StringComparison.OrdinalIgnoreCase) && user.Preferences.NotifyOnSnow)
+            {
+                return true;
+            }
+
+            // If none of the conditions are met, return false
+            return false;
         }
     }
 }
