@@ -667,4 +667,41 @@ namespace ForecastFavorApp_UnitTest
             Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
         }
     }
+    //Test Class for User Controller Test
+    [TestClass]
+    public class UsersControllerTests
+    {
+        private AppDbContext _context;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+
+            _context = new AppDbContext(options);
+        }
+        [TestMethod]
+        public async Task Index_ReturnsViewResult_WhenUsersNotNull()
+        {
+            var controller = new UsersController(_context);
+            var result = await controller.Index();
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+        }
+        [TestMethod]
+        public async Task Create_WithValidModel_RedirectsToIndex()
+        {
+            var controller = new UsersController(_context);
+            var user = new User
+            {
+                Username = "sreenath",
+                Email = "sree@mail.com"
+            };
+            var result = await controller.Create(user);
+            Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
+            Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
+            Assert.AreEqual(1, _context.Users.Count());
+        }
+    }
 }
