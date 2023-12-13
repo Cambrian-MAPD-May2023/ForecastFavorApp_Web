@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ForecastFavorApp\ForecastFavorApp.csproj" />
+    <ProjectReference Include="..\ForecastFavorLib\ForecastFavorLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,13 @@ using Newtonsoft.Json;
 using ForecastFavorLib.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using ForecastFavorApp.Data;
+using ForecastFavorLib.Data;
 using ForecastFavorLib.Services;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using RichardSzalay.MockHttp;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace ForecastFavorApp_UnitTest
@@ -585,15 +586,23 @@ namespace ForecastFavorApp_UnitTest
         private WeatherService _weatherService;
         private Mock<IHttpClientFactory> _httpClientFactoryMock;
         private Mock<IConfiguration> _configurationMock;
-
+        private Mock<IHubContext<NotificationHub>> _hubContextMock;
+        private Mock<AppDbContext> _dbContextMock;
         public WeatherServiceTests()
         {
             _configurationMock = new Mock<IConfiguration>();
             _configurationMock.Setup(x => x["WeatherAPI:ApiKey"]).Returns("sreenath");
             _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+            _hubContextMock = new Mock<IHubContext<NotificationHub>>();
+            var dbContextOptions = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("TestDatabase").Options;
+            _dbContextMock = new Mock<AppDbContext>(dbContextOptions);
+
             var services = new ServiceCollection();
             services.AddSingleton(_configurationMock.Object);
             services.AddSingleton(_httpClientFactoryMock.Object);
+            services.AddSingleton(_hubContextMock.Object);
+            services.AddSingleton(_dbContextMock.Object);
+
             var serviceProvider = services.BuildServiceProvider();
             _httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(() =>
             {
@@ -606,10 +615,11 @@ namespace ForecastFavorApp_UnitTest
 
             _weatherService = new WeatherService(
                 serviceProvider.GetRequiredService<IHttpClientFactory>(),
-                serviceProvider.GetRequiredService<IConfiguration>()
+                serviceProvider.GetRequiredService<IConfiguration>(),
+                serviceProvider.GetRequiredService<IHubContext<NotificationHub>>(),
+                serviceProvider.GetRequiredService<AppDbContext>()
             );
         }
-
         [TestMethod]
         public async Task GetCurrentWeatherAsync_ValidLocation_ReturnsCurrentWeatherResponse()
         {
