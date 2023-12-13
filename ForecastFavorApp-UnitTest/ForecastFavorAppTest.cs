@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.SignalR;
 using ForecastFavorApp.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace ForecastFavorApp_UnitTest
 {
     // test class for the CurrentWeatherResponseTests
@@ -702,6 +701,40 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
             Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
             Assert.AreEqual(1, _context.Users.Count());
+        }
+    }
+    //Test Class for Weather Controller test
+    [TestClass]
+    public class WeatherControllerTests
+    {
+        [TestMethod]
+        public async Task Index_ReturnsViewResultWithWeatherData()
+        {
+            var city = "Sudbury";
+            var weatherServiceMock = new Mock<IWeatherService>();
+            var currentWeather = new CurrentWeatherResponse { };
+            weatherServiceMock.Setup(s => s.GetCurrentWeatherAsync(city)).ReturnsAsync(currentWeather);
+            var controller = new WeatherController(weatherServiceMock.Object);
+            var result = await controller.Index(city);
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = (ViewResult)result;
+            Assert.AreEqual(currentWeather, viewResult.Model);
+        }
+
+        [TestMethod]
+        public async Task Tomorrow_ReturnsViewResultWithTomorrowForecast()
+        {
+            var city = "Sudbury";
+            var weatherServiceMock = new Mock<IWeatherService>();
+            var forecast = new ForecastResponse { Forecast = new Forecast { ForecastDay = new List<ForecastDay> { new ForecastDay(), new ForecastDay() } } };
+            weatherServiceMock.Setup(s => s.GetForecastAsync(city, 2)).ReturnsAsync(forecast);
+            var controller = new WeatherController(weatherServiceMock.Object);
+            var result = await controller.Tomorrow(city);
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = (ViewResult)result;
+            var model = viewResult.Model as ForecastDay;
+            Assert.IsNotNull(model);
+            Assert.AreEqual(forecast.Forecast.ForecastDay[1], model); // Assuming tomorrow is the second element
         }
     }
 }
