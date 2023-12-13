@@ -8,6 +8,15 @@
 @*Heading for the forecast of the next day*@
 <h2>Weather Forecast for Tomorrow</h2>
 
+
+<!-- Speech Recognition for City Input -->
+<div class="speech-recognition mt-3">
+    <p>Ask for the forecast in a city:</p>
+    <input type="text" id="speechCityInput" class="form-control" placeholder="Enter a city name" />
+    <button id="startCityRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
+</div>
+
+
 @*Check if the Model and the Day properties are not null to avoid null reference exceptions*@
 @if (Model != null && Model.Day != null)
 {
@@ -36,8 +45,40 @@ else
 }
 
 <script>
+    // Declare a variable to hold the speech recognition object
+    let recognitionCity;
+    
+    // Get references to HTML elements by their IDs
+    const speechCityInput = document.getElementById("speechCityInput");
+    const startCityRecognition = document.getElementById("startCityRecognition");
+
+    // Add a click event listener to the "Start Recognition" button
+    startCityRecognition.addEventListener("click", () => {
+        // Check if the recognitionCity object is not already initialized
+        if (!recognitionCity) {
+            // Create a new webkitSpeechRecognition object
+            recognitionCity = new webkitSpeechRecognition();
+
+            // Define a callback function to handle recognition results
+            recognitionCity.onresult = (event) => {
+                // Get the recognized speech result
+                const result = event.results[0][0].transcript;
+                
+                // Set the recognized result as the value of the input field
+                speechCityInput.value = result;
+                
+                // Call a function to fetch the forecast for the recognized city
+                fetchTomorrowForecast(result);
+            };
+        }
+
+        // Start the speech recognition
+        recognitionCity.start();
+    });
+
+    // Add a click event listener to the "Read Tomorrow's Forecast" button
     document.getElementById("readTomorrowForecastButton").addEventListener("click", function () {
-        // Extracting model data into JavaScript variables
+        // Extract model data into JavaScript variables (assumes this is Razor syntax)
         var maxTempC = '@Model.Day.MaxTempC';
         var conditionText = '@Model.Day.Condition.Text';
 
@@ -45,17 +86,32 @@ else
         var forecastText = `The maximum temperature tomorrow will be ${maxTempC} degrees Celsius. 
                             The condition is expected to be ${conditionText}.`;
 
-        // Call the speak function 
+        // Call the speak function to read the forecast text aloud
         speak(forecastText);
     });
 
+    // Function to speak the provided text
     function speak(text) {
+        // Create a SpeechSynthesisUtterance object
         const speech = new SpeechSynthesisUtterance();
+        
+        // Set the text to be spoken
         speech.text = text;
+        
+        // Set the language for speech synthesis (English - US)
         speech.lang = 'en-US'; 
+        
+        // Set the pitch and rate of speech
         speech.pitch = 1;
         speech.rate = 1;
+        
+        // Start the speech synthesis
         window.speechSynthesis.speak(speech);
     }
-</script>
 
+    // Function to fetch the forecast for tomorrow based on the recognized city
+    function fetchTomorrowForecast(city) {
+        // Redirect the user to a URL that fetches the forecast for the specified city
+        window.location.href = `/Weather/Tomorrow?city=${city}`;
+    }
+</script>
