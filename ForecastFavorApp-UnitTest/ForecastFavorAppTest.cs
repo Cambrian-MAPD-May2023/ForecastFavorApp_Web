@@ -9,6 +9,8 @@ using Moq;
 using RichardSzalay.MockHttp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SignalR;
+using ForecastFavorApp.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace ForecastFavorApp_UnitTest
@@ -628,5 +630,41 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsNotNull(result);
         }
     }
+    //Test class for Preferences Controller Tests
+    [TestClass]
+    public class PreferencesControllerTests
+    {
+        private AppDbContext? _context;
 
+        [TestInitialize]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+
+            _context = new AppDbContext(options);
+
+            var preference = new Preferences
+            {
+                PreferredLocations = "Sudbury",
+            };
+
+            _context.Preferences.Add(preference);
+            _context.SaveChanges();
+        }
+
+        [TestMethod]
+        public async Task Create_WithValidModel_RedirectsToIndex()
+        {
+            var controller = new PreferencesController(_context);
+            var preferences = new Preferences
+            {
+                PreferredLocations = "Sudbury",
+            };
+            var result = await controller.Create(preferences);
+            Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
+            Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
+        }
+    }
 }
