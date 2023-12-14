@@ -136,6 +136,8 @@
         overflow-x: auto;
         background-color: #bb77df52;
         border-radius: 6px;
+        margin-top: 10px;
+        margin-bottom: 15px;
     ">
             @foreach (var forecastDay in Model.Forecast.ForecastDay)
             {
@@ -152,14 +154,25 @@
                     background-color: #5e5263;
                     color: white;
                     text-align: center;
-                    min-width: 200px; /* Adjust the width as needed */
+                    min-width: 200px;
                 ">
                         <div class="hour" style="font-weight: 600; font-size: 1.25rem; margin-bottom: 5px;">
-                            @hourlyForecast.Time
+
+
+                            @{
+                                string dateTimeString = @hourlyForecast.Time;
+                                DateTime dateTime = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+                                // To display just the hour in 1-12 format with AM/PM
+                                string hour = dateTime.ToString("h tt"); // Example: "1 AM"
+
+                            }
+                            @hour
+
                         </div>
+
                         <div class="icon">
-                            <!-- Add weather icon here -->
-                            <img src="weather-icon.png" alt="Weather Icon" style="width: 40px; height: 40px;">
+                            <img src="@hourlyForecast.Condition.Icon" alt="Weather Icon" style="width: 40px; height: 40px;">
                         </div>
                         <div class="temperature" style="font-size: 1rem; margin-top: 5px;">
                             @hourlyForecast.TempC °C
@@ -179,28 +192,6 @@
     <div id="map" style="height:400px;width:100%;position: relative;overflow: hidden;box-shadow: 0 0 12px 0 rgb(180, 164, 209);border-radius: 20px;">
 
     </div>
-    <p id="demo" style="border: 3px solid green;margin-top: 20px;"></p>
-
-
-    <div>
-        @* Button to allow the user to fetch the latest weather data *@
-        <button id="fetchWeatherButton" class="btn btn-success btn-lg mt-3">Fetch Weather</button>
-    </div>
-
-    <script>document.getElementById("fetchWeatherButton").addEventListener("click", function () {
-            // Send a request to the Index action method
-            fetch("/Weather/Index")
-                .then(response => {
-                    if (response.ok) {
-                        // Handle a successful response
-                    } else {
-                        // Handle error response
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching weather data:", error);
-                });
-        });</script>
 
 </div>
 
@@ -318,5 +309,17 @@
     });
 
 
-</script>
-
+document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+        // Send a request to the Index action method
+        fetch("/Weather/Index")
+            .then(response => {
+                if (response.ok) {
+                    // Handle a successful response
+                } else {
+                    // Handle error response
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching weather data:", error);
+            });
+    });</script>
