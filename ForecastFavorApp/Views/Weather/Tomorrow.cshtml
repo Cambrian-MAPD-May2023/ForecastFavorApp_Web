@@ -4,13 +4,18 @@
 @{
     // Set the page title to be used in the layout for the <title> tag
     ViewData["Title"] = "Weather Forecast for Tomorrow";
+
+
+    var conditionMessage = $"Tomorrow's weather will range from maximum of {Model.Day.MaxTempC} °C to minimum of {Model.Day.MinTempC} °C . Tomorrow's humidity will be {Model.Day.AvgHumidity} and the condition will remain {Model.Day.Condition.Text} throughout the day.";
+    var sunrise = Model.Astros.Sunrise;
+    var sunset = Model.Astros.Sunset;
 }
 @*Heading for the forecast of the next day*@
 <h2>Weather Forecast for Tomorrow</h2>
 
 
 <!-- Speech Recognition for City Input -->
-<div class="speech-recognition mt-3">
+<div class="speech-recognition mt-3" style="margin-bottom:12px;">
     <p>Ask for the forecast in a city:</p>
     <input type="text" id="speechCityInput" class="form-control" placeholder="Enter a city name" />
     <button id="startCityRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
@@ -20,34 +25,60 @@
 @*Check if the Model and the Day properties are not null to avoid null reference exceptions*@
 @if (Model != null && Model.Day != null)
 {
-    // Begin a division to display the weather details
-    <div class="card border-primary mb-3">
-        <div class="card-body text-center">
-            <p><strong>Max Temperature:</strong> <i class="fa fa-temperature-empty"></i> @Model.Day.MaxTempC °C</p>
-            <p><strong>Min Temperature:</strong> <i class="fa fa-cloud"></i> @Model.Day.MinTempC °C</p>
-            <p><strong>Average Temperature:</strong> @Model.Day.AvgTempC °C</p>
-            <p><strong>Condition:</strong> @Model.Day.Condition.Text</p>
-            <p><strong>Max Wind Speed:</strong> @Model.Day.MaxWindKph kph</p>
-            <p><strong>Total Precipitation:</strong> @Model.Day.TotalPrecipIn inches</p>
-            <p><strong>Total Snow:</strong> @Model.Day.TotalSnowCm cm</p>
-            <p><strong>Average Humidity:</strong> @Model.Day.AvgHumidity %</p>
-            <p><strong>Chance of Rain:</strong> @Model.Day.DailyChanceOfRain %</p>
-            <p><strong>Chance of Snow:</strong> @Model.Day.DailyChanceOfSnow %</p>
-            <button id="readTomorrowForecastButton" class="btn btn-info btn-lg mt-3">Read Forecast Aloud</button>
-        </div>
+    //tomorrow's average
+  
+
+    <div id="cwcNow" style="margin-bottom:12px;">
+        <section id="currentWeatherCondition"
+                 style="background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);box-shadow: 0 0 12px 0 rgba(0,0,0,.2);border-radius: 20px;background-size: cover;">
+
+            <div id="currentWeatherCondition" style=" border-radius: 20px;">
+                <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
+                    <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@ViewBag.City</h1>
+                    <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
+                        As of @Model.Date  
+                    </span>
+                </div>
+
+                <div id="current-condition-body" style="border-radius:0 0 20px 20px; padding: 10px 16px;">
+                    <div id="current-condition-columns" style="display: flex;justify-content: space-between;">
+                        <div id="current-condition-primary" style="text-align: left; color:white; ">
+
+                            <span style="font-size: 4rem;line-height: 1;font-weight: 500;display: block;position: relative;">@Model.Day.AvgTempC °C (@Model.Day.AvgTempF °F)</span>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span> @Model.Day.Condition.Text</span></div>
+                            <div style=" line-height: 1.1;font-size: 1.0rem;font-weight: 700;margin-top: 5px;">
+                               
+                            </div>
+
+                        </div>
+                        <div id="current-condition-secondary" style="color:white;">
+                            <img src="https:@Model.Day.Condition.Icon" />
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: yellow;">Sunset @@ @sunset</span></div>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: #db6006d1;">Sunrise @@ @sunrise</span></div>
+                        </div>
+                    </div>
+
+                    <div class="current-condition-messages" style="flex-flow: row wrap;display: flex;justify-content: space-between;background-color: #5e5263; border-radius: 5px;margin-top: 10px;">
+                        <a href="https://en.wikipedia.org/wiki/Pearl_Jam" class="items" style="padding: 6px 10px; flex-basis: content;flex-grow: 1;text-decoration:none;color:white;text-align:center;"> @conditionMessage </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
+
+
 
 }
 else
 {
-// Display a message if the forecast data for tomorrow is unavailable
-<p>Forecast data for tomorrow is not available at the moment.</p>
+    // Display a message if the forecast data for tomorrow is unavailable
+    <p>Forecast data for tomorrow is not available at the moment.</p>
 }
 
 <script>
     // Declare a variable to hold the speech recognition object
     let recognitionCity;
-    
+
     // Get references to HTML elements by their IDs
     const speechCityInput = document.getElementById("speechCityInput");
     const startCityRecognition = document.getElementById("startCityRecognition");
@@ -63,10 +94,10 @@ else
             recognitionCity.onresult = (event) => {
                 // Get the recognized speech result
                 const result = event.results[0][0].transcript;
-                
+
                 // Set the recognized result as the value of the input field
                 speechCityInput.value = result;
-                
+
                 // Call a function to fetch the forecast for the recognized city
                 fetchTomorrowForecast(result);
             };
@@ -83,7 +114,7 @@ else
         var conditionText = '@Model.Day.Condition.Text';
 
         // Construct the forecast text to be read
-        var forecastText = `The maximum temperature tomorrow will be ${maxTempC} degrees Celsius. 
+        var forecastText = `The maximum temperature tomorrow will be ${maxTempC} degrees Celsius.
                             The condition is expected to be ${conditionText}.`;
 
         // Call the speak function to read the forecast text aloud
@@ -94,17 +125,17 @@ else
     function speak(text) {
         // Create a SpeechSynthesisUtterance object
         const speech = new SpeechSynthesisUtterance();
-        
+
         // Set the text to be spoken
         speech.text = text;
-        
+
         // Set the language for speech synthesis (English - US)
-        speech.lang = 'en-US'; 
-        
+        speech.lang = 'en-US';
+
         // Set the pitch and rate of speech
         speech.pitch = 1;
         speech.rate = 1;
-        
+
         // Start the speech synthesis
         window.speechSynthesis.speak(speech);
     }
@@ -115,3 +146,7 @@ else
         window.location.href = `/Weather/Tomorrow?city=${city}`;
     }
 </script>
+
+
+
+

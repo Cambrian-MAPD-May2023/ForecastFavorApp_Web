@@ -50,8 +50,9 @@ namespace ForecastFavorApp.Controllers
             if (string.IsNullOrWhiteSpace(city))
             {
                 // No city is provided, use the default city
-                city = "Sudbury";
+                city = "Sudbury, Ontario, Canada ";
             }
+            ViewBag.City = city;
 
             // Fetch the forecast for the next 2 days including today for the specified city.
             var forecast = await _weatherService.GetForecastAsync(city, 2);
