@@ -1,0 +1,69 @@
+﻿
+@model ForecastFavorLib.Models.APIModels.CurrentLocationForecastResponse
+
+    <!-- Speech Recognition for City Input -->
+    <div class="speech-recognition mt-3" style="margin-bottom:12px;">
+        <p>Ask for the forecast in a city:</p>
+        <input type="text" id="speechCityInput" class="form-control" placeholder="Enter a city name" />
+        <button id="startCityRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
+    </div>
+
+    @if (Model.Forecast.ForecastDay.Count() >= 0)
+    {
+
+        foreach (var item in Model.Forecast.ForecastDay)
+        {
+            <div id="cwcNow" style="margin-bottom:12px;">
+                <section id="currentWeatherCondition"
+                         style="background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);box-shadow: 0 0 12px 0 rgba(0,0,0,.2);border-radius: 20px;background-size: cover;">
+
+                    <div id="currentWeatherCondition" style=" border-radius: 20px;">
+                        <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
+                            <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@ViewBag.City</h1>
+                            <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
+                                As of @item.Date
+
+                            </span>
+                        </div>
+
+                        <div id="current-condition-body" style="border-radius:0 0 20px 20px; padding: 10px 16px;">
+                            <div id="current-condition-columns" style="display: flex;justify-content: space-between;">
+                                <div id="current-condition-primary" style="text-align: left; color:white; ">
+
+                                    <span style="font-size: 4rem;line-height: 1;font-weight: 500;display: block;position: relative;">@item.Day.AvgTempC °C (@item.Day.AvgTempF °F)</span>
+                                    <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span> @item.Day.Condition.Text</span></div>
+                                    <div style=" line-height: 1.1;font-size: 1.0rem;font-weight: 700;margin-top: 5px;">
+
+                                    </div>
+
+                                </div>
+                                <div id="current-condition-secondary" style="color:white;">
+                                    <img src="https:@item.Day.Condition.Icon" />
+                                    <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: yellow;">Sunset @@ @item.Astros.Sunset</span></div>
+                                    <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: #db6006d1;">Sunrise @@ @item.Astros.Sunrise</span></div>
+                                </div>
+                            </div>
+
+                            @{
+                                var conditionMessage = "It feels like " + item.Day.AvgTempC + " °C. " + "The wind is " + item.Day.MaxWindKph + " kph. " + "Average visibility of " + item.Day.AverageVisibilityKm + "kms.";
+                            }
+
+                            <div class="current-condition-messages" style="flex-flow: row wrap;display: flex;justify-content: space-between;background-color: #5e5263; border-radius: 5px;margin-top: 10px;">
+                                <a href="https://en.wikipedia.org/wiki/Pearl_Jam" class="items" style="padding: 6px 10px; flex-basis: content;flex-grow: 1;text-decoration:none;color:white;text-align:center;"> @conditionMessage </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        }
+
+
+    }
+    else
+    {
+        <p> sorry, no data available</p>
+    }
+
+
+
