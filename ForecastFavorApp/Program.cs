@@ -43,7 +43,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Weather}/{action=Index}/{id?}");
     endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
