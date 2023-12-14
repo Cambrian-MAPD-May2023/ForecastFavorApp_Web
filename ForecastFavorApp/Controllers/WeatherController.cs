@@ -45,7 +45,7 @@ namespace ForecastFavorApp.Controllers
         }
 
 
-       public async Task<IActionResult> Tomorrow(string city)
+        public async Task<IActionResult> Tomorrow(string city)
         {
             if (string.IsNullOrWhiteSpace(city))
             {
@@ -71,7 +71,21 @@ namespace ForecastFavorApp.Controllers
             return View(tomorrowForecast);
         }
 
+        public async Task<IActionResult> GetMultipleDayForecast()
+        {
+            var day = 3;
+            @ViewBag.City = "Sudbury";
+            var forecasts = await _weatherService.GetCurrentLocationForecastAsync("Sudbury", day);
+
+            return View("MultipleForecast",forecasts);
+        }
 
 
+        public async Task<IActionResult> UserPreferences()
+        {
+          
+
+            return View();
+        }
     }
 }
