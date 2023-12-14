@@ -8,6 +8,7 @@
 
 > [!NOTE]
 > The application is responsible for providing the forecast data related to the specific location...
+> API used in the application : Weather API (http://api.weatherapi.com/v1/forecast.json?key=bcea99f817174902bdc03259230311&q=sudbury&days=1&aqi=no&alerts=no)
 
 # Current view of Weather Forecast Landing Page (Today View)
 <img width="1440" alt="image" src="https://github.com/Cambrian-MAPD-May2023/ForecastFavorApp_Web/assets/74127503/f7117d91-0b36-4ad4-b7af-ced2323f9b0b">
