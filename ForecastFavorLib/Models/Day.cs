@@ -36,5 +36,8 @@ namespace ForecastFavorLib.Models
 
          [JsonProperty("daily_chance_of_snow")]
         public int DailyChanceOfSnow { get; set; }
+
+        [JsonProperty("avgvis_km")]
+        public string AverageVisibilityKm { get; set; }
     }
 }
