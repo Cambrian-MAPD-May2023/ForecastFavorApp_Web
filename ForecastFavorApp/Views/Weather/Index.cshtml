@@ -293,22 +293,6 @@
     }
     //End-Google Map- static
 
-    document.getElementById("fetchWeatherButton").addEventListener("click", function () {
-        // Send a request to the Index action method
-        fetch("/Weather/Index")
-            .then(response => {
-                if (response.ok) {
-                    // Handle a successful response
-                } else {
-                    // Handle error response
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching weather data:", error);
-            });
-    });
-
-
 document.getElementById("fetchWeatherButton").addEventListener("click", function () {
         // Send a request to the Index action method
         fetch("/Weather/Index")
