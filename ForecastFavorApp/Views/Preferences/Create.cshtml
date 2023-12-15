@@ -1,52 +1,55 @@
 @model ForecastFavorLib.Models.Preferences
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Assign preferences";
 }
 
-<h1>Create</h1>
+<div>
+    <a href="@Url.Action("Index", "Preferences" )" class="btn btn-primary btn-sm">
+        <i class="fa fa-angle-left"></i>
+        <span style="font-weight:bold; text-transform:uppercase;">Back to Preferences</span>
+    </a>
+    <h4 class="text-center">Create user preferences</h4>
+</div>
 
-<h4>Preferences</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="UserID" class="control-label"></label>
+                <label asp-for="UserID" class="control-label">User Id</label>
                 <select asp-for="UserID" class ="form-control" asp-items="ViewBag.UserID"></select>
             </div>
              <div class="form-group">
-                <label asp-for="NotifyOnRain" class="control-label"></label>
-                <input asp-for="NotifyOnRain" type="checkbox" /> Notify on Rain
+                 <label asp-for="NotifyOnRain" class="control-label">Notify on Rain</label>
+                <input asp-for="NotifyOnRain" type="checkbox" /> 
             </div>
             <div class="form-group">
-                <label asp-for="NotifyOnSun" class="control-label"></label>
-                <input asp-for="NotifyOnSun" type="checkbox" /> Notify on Sun
+                <label asp-for="NotifyOnSun" class="control-label">Notify on Sun</label>
+                <input asp-for="NotifyOnSun" type="checkbox" /> 
             </div>
               <div class="form-group">
-                <label asp-for="NotifyOnSnow" class="control-label"></label>
-                <input asp-for="NotifyOnSnow" type="checkbox" /> Notify on Snow
+                  <label asp-for="NotifyOnSnow" class="control-label">Notify on Snow</label>
+                <input asp-for="NotifyOnSnow" type="checkbox" /> 
             </div>
             <div class="form-group">
-                <label asp-for="NotifyOnClouds" class="control-label"></label>
-                <input asp-for="NotifyOnClouds" type="checkbox" /> Notify on Clouds
+                <label asp-for="NotifyOnClouds" class="control-label">Notify on Clouds</label>
+                <input asp-for="NotifyOnClouds" type="checkbox" /> 
             </div>
             <div class="form-group">
-                <label asp-for="PreferredLocations" class="control-label"></label>
-                <input asp-for="PreferredLocations" class="form-control" />
+                <label asp-for="PreferredLocations" class="control-label">Preferred Locations</label>
+                <input asp-for="PreferredLocations" class="form-control" placeholder="Please enter a location"/>
                 <span asp-validation-for="PreferredLocations" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group" style="margin-top:10px;">
+                <input type="submit" value="Create" class="btn btn-success" />
+
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

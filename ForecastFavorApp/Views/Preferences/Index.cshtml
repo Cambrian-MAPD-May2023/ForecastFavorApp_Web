@@ -1,14 +1,18 @@
-@model IEnumerable<ForecastFavorLib.Models.Preferences>
+@model IEnumerable<ForecastFavorApp.Models.PreferencesViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="alert-info alert-header" style="background-color: #27cdee38;text-align: center;">
+    <h3>User Preferences</h3>
+</div>
+
+<a href="@Url.Action("Create", "Preferences" )" class="btn btn-success btn-sm">
+    <i class="fa fa-plus"></i> <span style="font-weight:bold;">Assign new preference</span>
+</a>
+
 <table class="table">
     <thead>
         <tr>
@@ -34,32 +38,39 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-             <td>
-                @item.NotifyOnRain ? "Yes" : "No"
-            </td>
-            <td>
-                @item.NotifyOnSun ? "Yes" : "No"
-            </td>
-             <td>
-                @item.NotifyOnClouds ? "Yes" : "No"
-            </td>
-            <td>
-                @item.NotifyOnSnow ? "Yes" : "No"
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PreferredLocations)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PreferencesID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PreferencesID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PreferencesID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @(item.NotifyOnRain ? "Yes" : "No")
+                </td>
+                <td>
+                    @(item.NotifyOnSun ? "Yes" : "No")
+                </td>
+                <td>
+                    @(item.NotifyOnClouds ? "Yes" : "No")
+                </td>
+                <td>
+                    @(item.NotifyOnSnow ? "Yes" : "No")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PreferredLocations)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Email)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PreferencesId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.PreferencesId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.PreferencesId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<style>
+    a {
+        text-decoration: none;
+    }
+</style>
