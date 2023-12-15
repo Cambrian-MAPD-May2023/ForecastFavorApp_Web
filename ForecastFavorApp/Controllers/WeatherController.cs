@@ -22,17 +22,14 @@ namespace ForecastFavorApp.Controllers
         public async Task<IActionResult> Index(string city)
         {
 
-            // Ask the weather service for the weather in London and wait for it to come back
-            //var currentWeather = await _weatherService.GetCurrentWeatherAsync("Sudbury");
-            var currentWeather = await _weatherService.GetCurrentLocationForecastAsync("Sudbury");
-
-            // Send the weather data to our page to be displayed
-
-             if (string.IsNullOrWhiteSpace(city))
+            if (string.IsNullOrWhiteSpace(city))
             {
                 // No city is provided, use the default city
                 city = "Sudbury";
             }
+            // Ask the weather service for the weather in London and wait for it to come back
+            //var currentWeather = await _weatherService.GetCurrentWeatherAsync("Sudbury");
+            var currentWeather = await _weatherService.GetCurrentLocationForecastAsync(city);
 
            // var currentWeather = await _weatherService.GetCurrentWeatherAsync(city);
 
