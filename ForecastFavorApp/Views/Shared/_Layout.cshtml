@@ -40,8 +40,8 @@
                     </ul>
                 </div>
                 <div class="search-container">
-                    <input type="search" class="search-box" placeholder="Enter a location...">
-                    <button class="search-btn">Search</button>
+                    <input id="searchForecastInput" type="search" class="search-box" placeholder="Enter a location...">
+                    <button id="searchForecastBtn" class="search-btn">Search</button>
                 </div>
             </div>
         </nav>
@@ -67,6 +67,15 @@
     <!-- Include the custom JavaScript file for establishing and managing the SignalR connection -->
     <script src="~/js/signalr-connection.js"></script>
 
+    <script>// Function to fetch current weather for a given city
+        // Search button click
+        document.getElementById("searchForecastBtn").addEventListener("click", function () {
+            // Send a request to the Index action method
+            let city = document.getElementById("searchForecastInput").value;
+            console.log('searching city');
 
+            window.location.href = `/Weather/Index?city=${city}`;
+        });
+    </script>
 </body>
 </html>

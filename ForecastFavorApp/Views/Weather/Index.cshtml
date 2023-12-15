@@ -7,8 +7,9 @@
         async defer></script>
 
 @{
-    ViewData["Title"] = "Current Weather";
-    var conditionMessage = "It feels like " + Model.Current.FeelsLikeC + " °C. " + "The wind is " + Model.Current.WindKph + " kph. " + "Cloud coverage of " + Model.Current.Cloud + ".";
+    ViewData["Title"] = "Current Weather Forecast";
+    var conditionMessage = ViewBag.ConditionMessage;
+    conditionMessage = "It feels like " + Model.Current.FeelsLikeC + " °C. " + "The wind is " + Model.Current.WindKph + " kph. " + "Cloud coverage of " + Model.Current.Cloud + ".";
     var location = string.Concat(Model.Location.Name, ", ", Model.Location.Region, ", ", Model.Location.Country);
     var astros = Model.Forecast.ForecastDay.First();
     var sunrise = astros.Astros.Sunrise;
@@ -48,7 +49,7 @@
                 <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
                     <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@location</h1>
                     <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
-                        As of @DateTime.Now
+                        As of @Model.Location.LocalTime @(Model.Current.IsDay == "1" ? "AM" : "PM")
                     </span>
                 </div>
 
@@ -72,8 +73,8 @@
                         </div>
                         <div id="current-condition-secondary" style="color:white;">
                             <img src="https:@Model.Current.Condition.Icon" />
-                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: yellow;">Sunset @@ @sunset</span></div>
-                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: #db6006d1;">Sunrise @@ @sunrise</span></div>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: yellow;">Sunrise @@ @sunrise</span></div>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: #db6006d1;">Sunset @@ @sunset</span></div>
                         </div>
                     </div>
 
@@ -87,7 +88,6 @@
 
 
     @*hourly forecast*@
-
     <section style="
     box-sizing: border-box;
     border-radius: 6px;
@@ -180,10 +180,8 @@
     </section>
 
 
-
     @*MAP*@
     <div id="map" style="height:400px;width:100%;position: relative;overflow: hidden;box-shadow: 0 0 12px 0 rgb(180, 164, 209);border-radius: 20px;">
-
     </div>
 
 </div>
@@ -195,8 +193,8 @@
     let recognition;
 
     // Get references to HTML elements by their IDs
-    const speechInput = document.getElementById("speechInput");
-    const startRecognition = document.getElementById("startRecognition");
+    const speechInput = document.getElementById("speechInput"); // input text
+    const startRecognition = document.getElementById("startRecognition"); // speech button
 
     // Add a click event listener to the "Start Recognition" button
     startRecognition.addEventListener("click", () => {
@@ -204,6 +202,8 @@
         if (!recognition) {
             // Create a new webkitSpeechRecognition object
             recognition = new webkitSpeechRecognition();
+            //console.log(recognition);
+            console.debug();
 
             // Define a callback function to handle recognition results
             recognition.onresult = (event) => {
@@ -230,8 +230,9 @@
 
         // Construct the weather text to be read
         var weatherText = `Current temperature is ${temperatureC} degrees Celsius.
-                        The weather condition is ${conditionText}.`;
+                                            The weather condition is ${conditionText}.`;
 
+        console.log(weatherText);
         // Call the speak function to read the weather text aloud
         speak(weatherText);
     });
@@ -267,52 +268,60 @@
     let map;
 
     function initMap() {
+        var latitude = '@Model.Location.Latitude';
+        var longitude = '@Model.Location.Longitude';
 
         map = new google.maps.Map(document.getElementById("map"), {
             center: {
-                lat: 46.5227,
-                lng: -80.9527
+                lat: @Model.Location.Latitude,
+                lng: @Model.Location.Longitude,
             },
             zoom: 15,
         });
         var marker = new google.maps.Marker({
             position: {
-                lat: 46.5227,
-                lng: -80.9527
+                lat: @Model.Location.Latitude,
+                lng: @Model.Location.Longitude,
             },
             map: map,
             draggable: true
         });
     }
-    //End-Google Map- static
 
+
+
+    //REFRESH / FETCH BUTTON EVENT
     document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+        let city = document.getElementById("searchForecastInput").value;
+        if (city == '') {
+
+            const url = window.location.search; // 'https://localhost:7293/Weather/Index?city=bali';
+            city = getQueryParam(url, 'city');
+            //encodedCity = encodeURIComponent(city);
+        }
+        window.location.href = `/Weather/Index?city=${city}`;
         // Send a request to the Index action method
-        fetch("/Weather/Index")
-            .then(response => {
-                if (response.ok) {
-                    // Handle a successful response
-                } else {
-                    // Handle error response
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching weather data:", error);
-            });
+        //fetch("/Weather/Index")
+        //    .then(response => {
+        //        if (response.ok) {
+        //            // Handle a successful response
+        //        } else {
+        //            // Handle error response
+        //        }
+        //    })
+        //    .catch(error => {
+        //        console.error("Error fetching weather data:", error);
+        //    });
     });
 
+    //returns querystring value when passed querystring key
+    function getQueryParam(url, parameterName) {
+        const queryString = url.split('?')[1];
+        if (!queryString) return null;
 
-document.getElementById("fetchWeatherButton").addEventListener("click", function () {
-        // Send a request to the Index action method
-        fetch("/Weather/Index")
-            .then(response => {
-                if (response.ok) {
-                    // Handle a successful response
-                } else {
-                    // Handle error response
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching weather data:", error);
-            });
-    });</script>
+        const urlParams = new URLSearchParams(queryString);
+        return urlParams.get(parameterName);
+    }
+
+
+</script>
