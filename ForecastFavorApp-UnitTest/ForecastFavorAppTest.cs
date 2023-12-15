@@ -9,7 +9,8 @@ using Moq;
 using RichardSzalay.MockHttp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SignalR;
-
+using ForecastFavorApp.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ForecastFavorApp_UnitTest
 {
@@ -628,5 +629,112 @@ namespace ForecastFavorApp_UnitTest
             Assert.IsNotNull(result);
         }
     }
+    //Test class for Preferences Controller Tests
+    [TestClass]
+    public class PreferencesControllerTests
+    {
+        private AppDbContext? _context;
 
+        [TestInitialize]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+
+            _context = new AppDbContext(options);
+
+            var preference = new Preferences
+            {
+                PreferredLocations = "Sudbury",
+            };
+
+            _context.Preferences.Add(preference);
+            _context.SaveChanges();
+        }
+
+        [TestMethod]
+        public async Task Create_WithValidModel_RedirectsToIndex()
+        {
+            var controller = new PreferencesController(_context);
+            var preferences = new Preferences
+            {
+                PreferredLocations = "Sudbury",
+            };
+            var result = await controller.Create(preferences);
+            Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
+            Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
+        }
+    }
+    //Test Class for User Controller Test
+    [TestClass]
+    public class UsersControllerTests
+    {
+        private AppDbContext _context;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+
+            _context = new AppDbContext(options);
+        }
+        [TestMethod]
+        public async Task Index_ReturnsViewResult_WhenUsersNotNull()
+        {
+            var controller = new UsersController(_context);
+            var result = await controller.Index();
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+        }
+        [TestMethod]
+        public async Task Create_WithValidModel_RedirectsToIndex()
+        {
+            var controller = new UsersController(_context);
+            var user = new User
+            {
+                Username = "sreenath",
+                Email = "sree@mail.com"
+            };
+            var result = await controller.Create(user);
+            Assert.IsInstanceOfType(result, typeof(RedirectToActionResult));
+            Assert.AreEqual("Index", ((RedirectToActionResult)result).ActionName);
+            Assert.AreEqual(1, _context.Users.Count());
+        }
+    }
+    //Test Class for Weather Controller test
+    [TestClass]
+    public class WeatherControllerTests
+    {
+        [TestMethod]
+        public async Task Index_ReturnsViewResultWithWeatherData()
+        {
+            var city = "Sudbury";
+            var weatherServiceMock = new Mock<IWeatherService>();
+            var currentWeather = new CurrentWeatherResponse { };
+            weatherServiceMock.Setup(s => s.GetCurrentWeatherAsync(city)).ReturnsAsync(currentWeather);
+            var controller = new WeatherController(weatherServiceMock.Object);
+            var result = await controller.Index(city);
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = (ViewResult)result;
+            Assert.AreEqual(currentWeather, viewResult.Model);
+        }
+
+        [TestMethod]
+        public async Task Tomorrow_ReturnsViewResultWithTomorrowForecast()
+        {
+            var city = "Sudbury";
+            var weatherServiceMock = new Mock<IWeatherService>();
+            var forecast = new ForecastResponse { Forecast = new Forecast { ForecastDay = new List<ForecastDay> { new ForecastDay(), new ForecastDay() } } };
+            weatherServiceMock.Setup(s => s.GetForecastAsync(city, 2)).ReturnsAsync(forecast);
+            var controller = new WeatherController(weatherServiceMock.Object);
+            var result = await controller.Tomorrow(city);
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = (ViewResult)result;
+            var model = viewResult.Model as ForecastDay;
+            Assert.IsNotNull(model);
+            Assert.AreEqual(forecast.Forecast.ForecastDay[1], model); // Assuming tomorrow is the second element
+        }
+    }
 }
