@@ -79,13 +79,5 @@ namespace ForecastFavorApp.Controllers
 
             return View("MultipleForecast",forecasts);
         }
-
-
-        public async Task<IActionResult> UserPreferences()
-        {
-          
-
-            return View();
-        }
     }
 }
