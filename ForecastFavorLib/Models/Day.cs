@@ -16,7 +16,10 @@ namespace ForecastFavorLib.Models
         [JsonProperty("avgtemp_c")]
         public double AvgTempC { get; set; }
 
-         [JsonProperty("maxwind_kph")]
+        [JsonProperty("avgtemp_")]
+        public double AvgTempF { get; set; }
+
+        [JsonProperty("maxwind_kph")]
         public double MaxWindKph { get; set; }
 
         [JsonProperty("totalprecip_in")]
@@ -33,5 +36,8 @@ namespace ForecastFavorLib.Models
 
          [JsonProperty("daily_chance_of_snow")]
         public int DailyChanceOfSnow { get; set; }
+
+        [JsonProperty("avgvis_km")]
+        public string AverageVisibilityKm { get; set; }
     }
 }

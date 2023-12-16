@@ -1,0 +1,162 @@
+﻿#cwcNow {
+    margin-bottom: 12px;
+}
+
+#currentWeatherConditionSection {
+    background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);
+    box-shadow: 0 0 12px 0 rgba(0,0,0,.2);
+    border-radius: 20px;
+}
+
+#currentWeatherCondition {
+    border-radius: 20px;
+}
+
+#current-condition-header {
+    padding: 10px 16px;
+    background-color: #5e5263;
+    border-radius: 20px 20px 0 0;
+}
+
+#current-condition-location {
+    display: inline;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white;
+}
+
+#current-condition-timestamp {
+    font-size: 1.125rem;
+    padding-left: 2px;
+    color: white;
+}
+
+#current-condition-body {
+    border-radius: 0 0 20px 20px;
+    padding: 10px 16px;
+}
+
+#current-condition-columns {
+    display: flex;
+    justify-content: space-between;
+}
+
+#current-condition-primary {
+    text-align: left;
+    color: white;
+    border: 1px solid yellow;
+}
+
+#current-temperature {
+   font-size: 4rem;
+   line-height: 1;
+   font-weight: 500;
+   display: block;
+   position: relative;
+}
+
+#current-condition-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.1;
+    border: 1px solid green;
+}
+
+#current-feels-like {
+    line-height: 1.1;
+    font-size: 1.0rem;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.current-condition-messages {
+    flex-flow: row wrap;
+    display: flex;
+    justify-content: space-between;
+    background-color: #5e5263;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+    .current-condition-messages > a {
+        padding: 6px 10px;
+        flex-basis: content;
+        flex-grow: 1;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+    }
+
+
+#cwcDetails {
+    margin-bottom: 12px;
+    grid-auto-rows: max-content;
+    width: 100%;
+    grid-column: span 12;
+    grid-template-columns: minmax(0,1fr) 350px;
+    grid-column-gap: 12px;
+    max-width: 1162px;
+}
+
+    #cwcDetails > section {
+        box-sizing: border-box;
+        border-radius: 6px;
+        box-shadow: 0 0 12px 0 rgba(0,0,0,.2);
+        background-color: #bb77df52;
+        width: 100%;
+        container-type: inline-size;
+        container-name: card;
+        margin: 0 !important;
+        padding-right: 0px;
+    }
+
+        #cwcDetails > section > header {
+            padding: 16px;
+            display: block;
+            position: relative;
+            padding: 10px 16px;
+            background-color: #5e5263;
+            border-radius: 20px 20px 0 0;
+        }
+
+            #cwcDetails > section > header > h2 {
+                display: flex;
+                align-items: center;
+                font-weight: 600;
+                line-height: 1.2;
+                color: #2b2b2b;
+                font-size: 1.25rem !important;
+                color: white;
+            }
+
+#todayWeatherCard {
+    text-align: center;
+}
+
+    #todayWeatherCard > ul {
+        margin-top: 0;
+        box-sizing: border-box;
+        border: 2px solid yellow;
+        text-align: center;
+        border-width: 0px;
+        padding: 0 5px;
+        border-style: solid;
+        display: flex;
+        flex-basis: 20%;
+        justify-content: center;
+        list-style-type: none;
+    }
+
+
+    #todayWeatherCard ul li {
+        flex-basis: 20%;
+        text-align: center;
+    }
+
+#cwcDetailBody {
+    padding: 0 16px 11px 11px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    line-height: 1.5;
+}

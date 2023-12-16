@@ -6,8 +6,8 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using ForecastFavorLib.Models.APIModels;
 using Microsoft.EntityFrameworkCore;
-
 
 
 // Our services go in this namespace.
@@ -19,17 +19,23 @@ namespace ForecastFavorLib.Services
         // We use _httpClient to talk to the internet.
         private readonly HttpClient _httpClient;
         // We need an API key to ask WeatherAPI.com for data.
-        private readonly string _apiKey; 
-  
+        private readonly string _apiKey;
+
         // When we make a new WeatherService, we need to give it an HttpClient and an API key.
-       private readonly IHubContext<NotificationHub> _notificationHub;
+
+        public WeatherService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        { }
+            // Create a new HttpClient using the factory
+        private readonly IHubContext<NotificationHub> _notificationHub;
         private readonly AppDbContext _context;
 
-        public WeatherService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHubContext<NotificationHub> notificationHub, AppDbContext context)
+        public WeatherService(IHttpClientFactory httpClientFactory, IConfiguration configuration
+            , IHubContext<NotificationHub> notificationHub
+            , AppDbContext context)
         {
             _httpClient = httpClientFactory.CreateClient();
             _apiKey = configuration["WeatherAPI:ApiKey"] ?? throw new InvalidOperationException("API key not found in configuration");
-            _notificationHub = notificationHub;
+           _notificationHub = notificationHub;
             _context = context;
         }
 
@@ -55,7 +61,7 @@ namespace ForecastFavorLib.Services
             var jsonResponse = await response.Content.ReadAsStringAsync();
             // Then we turn that text into a CurrentWeatherResponse object.
             var currentWeatherResponse = JsonConvert.DeserializeObject<CurrentWeatherResponse>(jsonResponse);
-            
+
             // If we didn't get proper data back, we throw an error.
             if (currentWeatherResponse == null)
             {
@@ -98,6 +104,39 @@ namespace ForecastFavorLib.Services
             return forecastResponse;
         }
 
+        /// <summary>
+        /// Returns LOCATION, CURRENT MOMENT FORECAST AND WHOLE DAY FORECAST data 
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="days"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="HttpRequestException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<CurrentLocationForecastResponse> GetCurrentLocationForecastAsync(string location, int days = 1)
+        {
+            if (string.IsNullOrEmpty(location)) throw new ArgumentException("Location cannot be null or empty.", nameof(location));//TODO: this is no good practice
+
+            var url = $"http://api.weatherapi.com/v1/forecast.json?key={_apiKey}&q={location}&days={days}&aqi=no&alerts=no";
+
+            var response = await _httpClient.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode) throw new HttpRequestException($"Error fetching weather forecast: {response.StatusCode}");
+
+
+            // We read the data we got and turn it into text.
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+
+            // Then we turn that text into a ForecastResponse object.
+            var forecastResponse = JsonConvert.DeserializeObject<CurrentLocationForecastResponse>(jsonResponse);
+
+            // If we didn't get proper data back, we throw an error.
+            if (forecastResponse == null) throw new InvalidOperationException("Unable to deserialize the forecast data.");
+
+            // If everything went well, we return the forecast data.
+            return forecastResponse;
+        }
 
         /// Asynchronously gets a personalized weather condition message for a specified location.
        public async Task<string> GetWeatherConditionMessageAsync(string location)
@@ -195,7 +234,5 @@ namespace ForecastFavorLib.Services
             // If none of the conditions are met, return false
             return false;
         }
-
-
     }
 }

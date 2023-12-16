@@ -15,4 +15,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Models\APIModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\APIModels\" />
+  </ItemGroup>
 </Project>

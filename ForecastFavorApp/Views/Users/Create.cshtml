@@ -1,16 +1,20 @@
-@model ForecastFavorLib.Models.User
+@model ForecastFavorApp.Models.AddEditUserViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add new user";
 }
 
-<h1>Create</h1>
-
-<h4>User</h4>
+<div>
+    <a href="@Url.Action("Index", "Users" )" class="btn btn-primary btn-sm">
+        <i class="fa fa-angle-left"></i>
+        <span style="font-weight:bold; text-transform:uppercase;">Back to Users</span>
+    </a>
+    <h4 class="text-center">Create User</h4>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" class="form-horizontal">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Username" class="control-label"></label>
@@ -22,17 +26,20 @@
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group" style="margin-top:10px;">
+                <input type="submit" value="Create" class="btn btn-success" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

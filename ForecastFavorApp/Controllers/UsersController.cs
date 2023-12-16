@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ForecastFavorLib.Data;
 using ForecastFavorLib.Models;
+using ForecastFavorApp.Models;
 
 namespace ForecastFavorApp.Controllers
 {
@@ -22,9 +23,18 @@ namespace ForecastFavorApp.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-              return _context.Users != null ? 
-                          View(await _context.Users.ToListAsync()) :
-                          Problem("Entity set 'AppDbContext.Users'  is null.");
+            var users = await _context.Users.ToListAsync();
+
+            if (users == null)
+                Problem("Entity set 'AppDbContext.Users'  is null.");
+
+            var model = (from item in users
+                         select new UserViewModel { UserId = item.UserID, Username = item.Username, Email = item.Email }).ToList();
+            return View(model);
+
+            //return _context.Users != null ? 
+            //              View(await _context.Users.ToListAsync()) :
+            //              Problem("Entity set 'AppDbContext.Users'  is null.");
         }
 
         // GET: Users/Details/5
@@ -48,7 +58,7 @@ namespace ForecastFavorApp.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new AddEditUserViewModel());
         }
 
         // POST: Users/Create
@@ -56,15 +66,16 @@ namespace ForecastFavorApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Username,Email")] User user)
+        public async Task<IActionResult> Create(AddEditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var user = new User { Username = model.Username, Email = model.Email };
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(model);
         }
 
         // GET: Users/Edit/5
@@ -80,7 +91,8 @@ namespace ForecastFavorApp.Controllers
             {
                 return NotFound();
             }
-            return View(user);
+
+            return View(new AddEditUserViewModel { UserId = user.UserID, Username = user.Username, Email = user.Email });
         }
 
         // POST: Users/Edit/5
@@ -88,23 +100,27 @@ namespace ForecastFavorApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserID,Username,Email")] User user)
+        public async Task<IActionResult> Edit(AddEditUserViewModel model)
         {
-            if (id != user.UserID)
-            {
-                return NotFound();
-            }
+
+            if (model.UserId.HasValue == false) return NotFound();
+
+            var user = await _context.Users.FindAsync(model.UserId);
+            if (user == null) return NotFound();
+
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    user.Username = model.Username;
+                    user.Email = model.Email;
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserID))
+                    if (!UserExists(model.UserId.Value))
                     {
                         return NotFound();
                     }
@@ -115,7 +131,7 @@ namespace ForecastFavorApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(model);
         }
 
         // GET: Users/Delete/5
@@ -150,14 +166,14 @@ namespace ForecastFavorApp.Controllers
             {
                 _context.Users.Remove(user);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
         {
-          return (_context.Users?.Any(e => e.UserID == id)).GetValueOrDefault();
+            return (_context.Users?.Any(e => e.UserID == id)).GetValueOrDefault();
         }
     }
 }

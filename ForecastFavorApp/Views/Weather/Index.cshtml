@@ -1,56 +1,199 @@
-@model ForecastFavorLib.Models.CurrentWeatherResponse
+@* Specify the model that this view expects, which is the CurrentWeatherResponse *@
+@model ForecastFavorLib.Models.APIModels.CurrentLocationForecastResponse
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4HKfiUvRAtp5-DeqR1iR5veUCjy4avvo&callback=initMap&libraries=&v=weekly"
+        async defer></script>
 
 @{
-    ViewData["Title"] = "Current Weather";
+    ViewData["Title"] = "Current Weather Forecast";
+    var conditionMessage = ViewBag.ConditionMessage;
+    conditionMessage = "It feels like " + Model.Current.FeelsLikeC + " °C. " + "The wind is " + Model.Current.WindKph + " kph. " + "Cloud coverage of " + Model.Current.Cloud + ".";
+    var location = string.Concat(Model.Location.Name, ", ", Model.Location.Region, ", ", Model.Location.Country);
+    var astros = Model.Forecast.ForecastDay.First();
+    var sunrise = astros.Astros.Sunrise;
+    var sunset = astros.Astros.Sunset;
 }
 
+@* Display the current weather heading, indicating the location as Sudbury *@
 <div class="container mt-5">
-    <!-- Speech Recognition -->
-    <div class="speech-recognition mt-3">
-        <p>Ask for weather in a city:</p>
-        <input type="text" id="speechInput" class="form-control" placeholder="Enter a city name" />
-        <button id="startRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
+    <h5 class="text-center">Today's Weather Forecast</h5>
+
+    @* BUTTON REFRESH & SPEECH & SPEAK*@
+    <div style="margin-bottom:12px;">
+        <button id="fetchWeatherButton" class="btn btn-success mt-3" style="margin-right: 5px;"><i class="fa fa-refresh"></i>Refresh</button>
+        <button id="readWeatherButton" class="btn btn-info mt-3" style="margin-right: 5px;">Read Weather Aloud</button>
+        <button id="startRecognition" class="btn btn-primary mt-3">Start Speech Recognition</button>
     </div>
 
 
+    <!-- SEARCH -->
+    <div class="speech-recognition" style="display: flex;align-items: center;border: 1px solid #ccc;padding: 10px;border-radius: 5px;">
+        <p style="margin:0px;  margin-right: 0px;margin-right: 15px;" class="form-label">Ask for weather in a city:   </p>
+        <input type="text" id="speechInput" class="form-control" placeholder="Enter a city name" style="width: 50%;margin-right: 15px;" />
+        <p style="margin:0;">Current Location: @Model.Location.Name, @Model.Location.Country</p>
+    </div>
 
-    <!-- Current Location -->
-    <div class="current-location">
-        <p>Current Location: @Model.Location.Name, @Model.Location.Country</p>
+    <!-- Read Weather -->
+    <!--<div class="current-location" style="margin-bottom:12px;">-->
         <!-- Button to trigger text-to-speech -->
-        <button id="readWeatherButton" class="btn btn-info btn-lg mt-3">Read Weather Aloud</button>
+    <!--</div>-->
+
+
+    @*CURRENT*@
+    <div id="cwcNow" style="margin-bottom:12px;">
+        <section id="currentWeatherCondition"
+                 style="background-image: url(https://s.w-x.co/WeatherImages_Web/WeatherImage_Cloudy-day_2.jpg?crop=16:9&width=800&format=pjpg&auto=webp&quality=70);box-shadow: 0 0 12px 0 rgba(0,0,0,.2);border-radius: 20px;background-size: cover;">
+
+            <div id="currentWeatherCondition" style=" border-radius: 20px;">
+                <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
+                    <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@location</h1>
+                    <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
+                        As of @Model.Location.LocalTime @(Model.Current.IsDay == "1" ? "AM" : "PM")
+                    </span>
+                </div>
+
+                <div id="current-condition-body" style="border-radius:0 0 20px 20px; padding: 10px 16px;">
+                    <div id="current-condition-columns" style="display: flex;justify-content: space-between;">
+                        <div id="current-condition-primary" style="text-align: left; color:white; ">
+
+                            <span style="font-size: 4rem;line-height: 1;font-weight: 500;display: block;position: relative;">@Model.Current.TemperatureC °C (@Model.Current.TemperatureF °F)</span>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span> @Model.Current.Condition.Text</span></div>
+                            <div style=" line-height: 1.1;font-size: 1.0rem;font-weight: 700;margin-top: 5px;">
+                                @if (Model.Current.IsDay.Equals("0"))
+                                {
+                                    <span>Good Evening!</span> <i class="fa fa-solid fa-champagne-glasses"></i>
+                                }
+                                else
+                                {
+                                    <span>Good Morning!</span> <i class="fa fa-solid fa-mug-saucer"></i>
+                                }
+                            </div>
+
+                        </div>
+                        <div id="current-condition-secondary" style="color:white;">
+                            <img src="https:@Model.Current.Condition.Icon" />
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: yellow;">Sunrise @@ @sunrise</span></div>
+                            <div style="font-size: 1.25rem; font-weight: 600;line-height: 1.1;"><span style="color: #db6006d1;">Sunset @@ @sunset</span></div>
+                        </div>
+                    </div>
+
+                    <div class="current-condition-messages" style="flex-flow: row wrap;display: flex;justify-content: space-between;background-color: #5e5263; border-radius: 5px;margin-top: 10px;">
+                        <a href="https://en.wikipedia.org/wiki/Pearl_Jam" class="items" style="padding: 6px 10px; flex-basis: content;flex-grow: 1;text-decoration:none;color:white;text-align:center;"> @conditionMessage </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Current Weather Card -->
-    <div class="card border-primary mb-3 current-weather">
-        <div class="card-body text-center">
-            <!-- Display city and country in the card title -->
-            <h3 class="card-title mb-4">@Model.Location.Name, @Model.Location.Country</h3>
-            <!-- Weather Details on Left -->
-            <div class="weather-details-left">
-                <p class="card-text"><strong>Temperature:</strong> <i class="fas fa-temperature-low"></i> @Model.Current.TemperatureC °C (@Model.Current.TemperatureF °F)</p>
-                <p class="card-text"><strong>Condition:</strong> <i class="fa fa-cloud"></i> @(Model.Current.Condition?.Text ?? "Not available")</p>
-                <p class="card-text"><strong>Pressure:</strong> @Model.Current.PressureIn inches</p>
-                <p class="card-text"><strong>Humidity:</strong> <i class="fa fa-droplet"></i> @Model.Current.Humidity %</p>
-            </div>
-            <!-- Weather Details on Right -->
-            <div class="weather-details-right">
-                <p class="card-text"><strong>Cloud Cover:</strong> <i class="fa fa-cloud"></i> @Model.Current.Cloud %</p>
-                <p class="card-text"><strong>Feels Like:</strong>@Model.Current.FeelsLikeC °C</p>
-                <p class="card-text"><strong>Wind Speed: </strong> <i class="fa fa-wind"></i> @Model.Current.WindKph kph</p>
-            </div>
+
+    @*hourly forecast*@
+    <section style="
+    box-sizing: border-box;
+    border-radius: 6px;
+    box-shadow: 0 0 12px 0 rgba(0,0,0,.2);
+    background-color: #bb77df52;
+    width: 100%;
+    container-type: inline-size;
+    container-name: card;
+    margin-bottom: 12px;
+    padding-right: 0px;
+    margin-top: 50px;
+">
+        <!-- Header -->
+        <header style="
+        padding: 16px;
+        display: block;
+        position: relative;
+        padding: 10px 16px;
+        background-color: #5e5263;
+        border-radius: 20px 20px 0 0;
+    ">
+            <h2 style="
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #2b2b2b;
+            font-size: 1.25rem !important;
+            color: white;
+        ">
+                Hourly Forecast
+            </h2>
+        </header>
+
+        <!-- Hourly Forecast Container -->
+        <div id="hourlyForecast" style="
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        background-color: #bb77df52;
+        border-radius: 6px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    ">
+            @foreach (var forecastDay in Model.Forecast.ForecastDay)
+            {
+                @foreach (var hourlyForecast in forecastDay.HourlyForecasts)
+                {
+                    <div class="hour-container" style="
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    margin-right: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    border-radius: 20px;
+                    background-color: #5e5263;
+                    color: white;
+                    text-align: center;
+                    min-width: 200px;
+                ">
+                        <div class="hour" style="font-weight: 600; font-size: 1.25rem; margin-bottom: 5px;">
+
+
+                            @{
+                                string dateTimeString = @hourlyForecast.Time;
+                                DateTime dateTime = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+                                // To display just the hour in 1-12 format with AM/PM
+                                string hour = dateTime.ToString("h tt"); // Example: "1 AM"
+
+                            }
+                            @hour
+
+                        </div>
+
+                        <div class="icon">
+                            <img src="@hourlyForecast.Condition.Icon" alt="Weather Icon" style="width: 40px; height: 40px;">
+                        </div>
+                        <div class="temperature" style="font-size: 1rem; margin-top: 5px;">
+                            @hourlyForecast.TempC °C
+                        </div>
+                        <div class="condition" style="font-style: italic; margin-top: 5px;">
+                            @hourlyForecast.Condition.Text
+                        </div>
+                    </div>
+                }
+            }
         </div>
+    </section>
+
+
+    @*MAP*@
+    <div id="map" style="height:400px;width:100%;position: relative;overflow: hidden;box-shadow: 0 0 12px 0 rgb(180, 164, 209);border-radius: 20px;">
     </div>
+
 </div>
+
 
 
 <script>
     // Declare a variable to hold the speech recognition object
     let recognition;
-    
+
     // Get references to HTML elements by their IDs
-    const speechInput = document.getElementById("speechInput");
-    const startRecognition = document.getElementById("startRecognition");
+    const speechInput = document.getElementById("speechInput"); // input text
+    const startRecognition = document.getElementById("startRecognition"); // speech button
 
     // Add a click event listener to the "Start Recognition" button
     startRecognition.addEventListener("click", () => {
@@ -58,15 +201,15 @@
         if (!recognition) {
             // Create a new webkitSpeechRecognition object
             recognition = new webkitSpeechRecognition();
-
+            
             // Define a callback function to handle recognition results
             recognition.onresult = (event) => {
                 // Get the recognized speech result
                 const result = event.results[0][0].transcript;
-                
+
                 // Set the recognized result as the value of the input field
                 speechInput.value = result;
-                
+
                 // Call a function to fetch current weather for the recognized city
                 fetchCurrentWeather(result);
             };
@@ -83,9 +226,10 @@
         var conditionText = '@(Model.Current.Condition?.Text ?? "not available")';
 
         // Construct the weather text to be read
-        var weatherText = `Current temperature is ${temperatureC} degrees Celsius. 
-                        The weather condition is ${conditionText}.`;
+        var weatherText = `Current temperature is ${temperatureC} degrees Celsius.
+                                            The weather condition is ${conditionText}.`;
 
+        console.log(weatherText);
         // Call the speak function to read the weather text aloud
         speak(weatherText);
     });
@@ -100,18 +244,68 @@
     function speak(text) {
         // Create a SpeechSynthesisUtterance object
         const speech = new SpeechSynthesisUtterance();
-        
+
         // Set the text to be spoken
         speech.text = text;
-        
+
         // Set the language for speech synthesis (English - US)
-        speech.lang = 'en-US'; 
-        
+        speech.lang = 'en-US';
+
         // Set the pitch and rate of speech
         speech.pitch = 1;
         speech.rate = 1;
-        
+
         // Start the speech synthesis
         window.speechSynthesis.speak(speech);
     }
+
+    // GOOGLE MAPS
+
+    //Start-Google Map- static
+    let map;
+
+    function initMap() {
+        var latitude = '@Model.Location.Latitude';
+        var longitude = '@Model.Location.Longitude';
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: {
+                lat: @Model.Location.Latitude,
+                lng: @Model.Location.Longitude,
+            },
+            zoom: 15,
+        });
+        var marker = new google.maps.Marker({
+            position: {
+                lat: @Model.Location.Latitude,
+                lng: @Model.Location.Longitude,
+            },
+            map: map,
+            draggable: true
+        });
+    }
+
+
+
+    //REFRESH / FETCH BUTTON EVENT
+    document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+        let city = document.getElementById("searchForecastInput").value;
+        if (city == '') {
+
+            const url = window.location.search; // 'https://localhost:7293/Weather/Index?city=bali';
+            city = getQueryParam(url, 'city');
+        }
+        window.location.href = `/Weather/Index?city=${city}`;
+    });
+
+    //returns querystring value when passed querystring key
+    function getQueryParam(url, parameterName) {
+        const queryString = url.split('?')[1];
+        if (!queryString) return null;
+
+        const urlParams = new URLSearchParams(queryString);
+        return urlParams.get(parameterName);
+    }
+
+
 </script>

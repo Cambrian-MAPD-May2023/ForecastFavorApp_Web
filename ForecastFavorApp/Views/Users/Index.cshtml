@@ -1,14 +1,17 @@
-@model IEnumerable<ForecastFavorLib.Models.User>
+@model IEnumerable<ForecastFavorApp.Models.UserViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Users";
 }
 
-<h1>Index</h1>
+<div class="alert-info alert-header" style="background-color: #27cdee38;text-align: center;">
+    <h3>Application Users</h3>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<a href="@Url.Action("Create", "Users" )" class="btn btn-success btn-sm">
+    <i class="fa fa-plus"></i> <span style="font-weight:bold;">Create new</span>
+</a>
+
 <table class="table">
     <thead>
         <tr>
@@ -18,24 +21,32 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
+<style>
+    a {
+        text-decoration: none;
+    }
+</style>

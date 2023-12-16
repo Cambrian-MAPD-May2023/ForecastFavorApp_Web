@@ -3,8 +3,10 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="alert alert-danger">
+    <h1 class="text-danger" style="text-align:center;">OOopppsssss!! Something went wrong..</h1>
+    <h4 class="text-danger">An error occurred while processing your request.. <i>@ViewBag.ErrorMessage</i></h4>
+</div>
 
 @if (Model.ShowRequestId)
 {
