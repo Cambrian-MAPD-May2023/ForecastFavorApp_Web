@@ -7,100 +7,134 @@ using System.Diagnostics;
 // This is our WeatherController that deals with weather-related pages
 namespace ForecastFavorApp.Controllers
 {
-// Inherits from Controller so we get all the MVC controller functionality
-public class WeatherController : Controller
-{
-    // This service lets us get weather data
-    private readonly IWeatherService _weatherService;
-    private readonly string DEF_CITY = "Sudbury";// _weatherService;
-
-    // Constructor: .NET gives us an IWeatherService when it makes this controller
-    public WeatherController(IWeatherService weatherService)
+    // Inherits from Controller so we get all the MVC controller functionality
+    public class WeatherController : Controller
     {
-        // Save the service so we can use it later
-        _weatherService = weatherService;
-    }
+        // This service lets us get weather data
+        private readonly IWeatherService _weatherService;
+        private readonly string DEF_CITY = "Sudbury";
 
-    // The main page of our weather section
-    public async Task<IActionResult> Index(string city)
-    {
-        try
+        // Constructor: .NET gives us an IWeatherService when it makes this controller
+        public WeatherController(IWeatherService weatherService)
         {
+            // this is DI
+            _weatherService = weatherService;
+        }
+
+        /// <summary>
+        /// Landing Page of weather web app.
+        /// It displays the current weather forecast for today.
+        /// </summary>
+        /// <param name="city">City location</param>
+        /// <returns>View with today's forecast</returns>
+        public async Task<IActionResult> Index(string city)
+        {
+            try
+            {
+                // retrieve city location from user input, session
+                if (string.IsNullOrWhiteSpace(city) || city == "null") // no location mentioned 0 
+                {
+                    // check if we have city in session 
+                    var searchCity = HttpContext.Session.GetString("searchCity"); // get from session 
+
+                    if (string.IsNullOrEmpty(searchCity) || searchCity == null) // no location in session 0
+                    {
+                        // No city is provided, use the default city
+                        city = DEF_CITY;
+                        HttpContext.Session.SetString("searchCity", city); // save to session
+
+                    }
+                    else // yeas location in session  1
+                    {
+                        city = searchCity;
+                    }
+                }
+                else // location provided 1
+                {
+                    // save the city in session variable
+                    HttpContext.Session.SetString("searchCity", city);
+                }
+
+                //fetch all weather data for a city asynchronously.
+                var currentWeather = await _weatherService.GetCurrentLocationForecastAsync(city);
+
+                // Check and potentially send a notification
+                ViewBag.ConditionMessage = await _weatherService.GetWeatherConditionMessageAsync(city);
+
+                // Send the weather data to the view to be displayed
+                return View(currentWeather);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("~/Views/Shared/Error.cshtml", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+
+        }
+
+        /// <summary>
+        /// Tomorrow page of weather web app.
+        /// It displays the weather forecast for following day.
+        /// </summary>
+        /// <param name="city">City location</param>
+        /// <returns>View with tomorrow's weather forecast.</returns>
+        public async Task<IActionResult> Tomorrow(string city)
+        {
+            // retrieve city location from user input, session
             if (string.IsNullOrWhiteSpace(city) || city == "null") // no location mentioned 0 
             {
-                // check if we have city in session 
-                var searchCity = HttpContext.Session.GetString("searchCity"); // get from session 
-
-                if (string.IsNullOrEmpty(searchCity) || searchCity == null) // no location in session 0
+                var sessionCity = HttpContext.Session.GetString("searchCity"); // get from session 
+                if (sessionCity == null || string.IsNullOrEmpty(sessionCity)) // no city mentioned 
                 {
-                    // No city is provided, use the default city
-                    city = DEF_CITY;
-                    HttpContext.Session.SetString("searchCity", city); // save to session
-
+                    city = DEF_CITY; // set to default value
+                                     // save the city in session variable
+                    HttpContext.Session.SetString("searchCity", city); // save in session
                 }
-                else // yeas location in session  1
+                else
                 {
-                    city = searchCity;
+                    city = sessionCity;
                 }
             }
-            else // location provided 1
-            {
-                // save the city in session variable
-                HttpContext.Session.SetString("searchCity", city);
-            }
 
-
-            var currentWeather = await _weatherService.GetCurrentLocationForecastAsync(city);
-
-            // var currentWeather = await _weatherService.GetCurrentWeatherAsync(city);
-
-            // Check and potentially send a notification
+            ViewBag.City = city;
+            var weatherForecasts = await _weatherService.GetCurrentLocationForecastAsync(city, 2);
             ViewBag.ConditionMessage = await _weatherService.GetWeatherConditionMessageAsync(city);
-            // Send the weather data to the view to be displayed
-            return View(currentWeather);
+
+            var tom = weatherForecasts.Forecast.ForecastDay.ElementAtOrDefault(1);// just take tomorrows data
+            if (tom != null)
+            {
+                weatherForecasts.Forecast.ForecastDay.Clear();// remove existing items and add just the one you need
+                weatherForecasts.Forecast.ForecastDay.Add(tom);
             }
-        catch (Exception ex)
-        {
-            ViewBag.ErrorMessage = ex.Message;
-            return View("~/Views/Shared/Error.cshtml", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+            // Pass the forecast for tomorrow to the view.
+            return View(weatherForecasts);
         }
 
-    }
-
-
-    public async Task<IActionResult> Tomorrow(string city)
-    {
-        if (string.IsNullOrWhiteSpace(city))
+        public async Task<IActionResult> GetMultipleDayForecast(string city)
         {
-            // No city is provided, use the default city
-            city = "Sudbury, Ontario, Canada ";
+            var day = 3;
+
+            if (string.IsNullOrWhiteSpace(city) || city == "null") // no location mentioned 0 
+            {
+                var sessionCity = HttpContext.Session.GetString("searchCity"); // get from session 
+                if (sessionCity == null || string.IsNullOrEmpty(sessionCity)) // no city mentioned 
+                {
+                    city = DEF_CITY; // set to default value
+                                     // save the city in session variable
+                    HttpContext.Session.SetString("searchCity", city); // save in session
+                }
+                else
+                {
+                    city = sessionCity;
+                }
+            }
+
+            ViewBag.City = city;
+
+            var forecasts = await _weatherService.GetCurrentLocationForecastAsync(city, day);
+
+            return View("MultipleForecast", forecasts);
         }
-        ViewBag.City = city;
-
-        // Fetch the forecast for the next 2 days including today for the specified city.
-        var forecast = await _weatherService.GetForecastAsync(city, 2);
-
-        // Select the forecast for tomorrow which should be the second element of the forecastday array.
-        var tomorrowForecast = forecast.Forecast.ForecastDay.ElementAtOrDefault(1);
-
-        // Check if tomorrow's forecast is available.
-        if (tomorrowForecast == null)
-        {
-            // Handle the case where tomorrow's forecast is not available.
-            return View("Error");
-        }
-
-        // Pass the forecast for tomorrow to the view.
-        return View(tomorrowForecast);
     }
-
-    public async Task<IActionResult> GetMultipleDayForecast()
-    {
-        var day = 3;
-        @ViewBag.City = "Sudbury";
-        var forecasts = await _weatherService.GetCurrentLocationForecastAsync("Sudbury", day);
-
-        return View("MultipleForecast",forecasts);
-    }
-}
 }
