@@ -1,11 +1,32 @@
-﻿
-@model ForecastFavorLib.Models.APIModels.CurrentLocationForecastResponse
+﻿@model ForecastFavorLib.Models.APIModels.CurrentLocationForecastResponse
 
-    <!-- Speech Recognition for City Input -->
-    <div class="speech-recognition mt-3" style="margin-bottom:12px;">
-        <p>Ask for the forecast in a city:</p>
-        <input type="text" id="speechCityInput" class="form-control" placeholder="Enter a city name" />
-        <button id="startCityRecognition" class="btn btn-primary mt-2">Start Speech Recognition</button>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4HKfiUvRAtp5-DeqR1iR5veUCjy4avvo&callback=initMap&libraries=&v=weekly"
+        async defer></script>
+
+@{
+    ViewData["Title"] = "Weather Forecast for Next 3 Days";
+
+    var location = string.Concat(Model.Location.Name, ", ", Model.Location.Region, ", ", Model.Location.Country);
+}
+
+@* Display the 3 day forecast*@
+
+<div class="container mt-5">
+    <h5 class="text-center">Weather Forecast for Next 3 Days</h5>
+
+    @* BUTTON REFRESH & SPEECH & SPEAK*@
+    <div style="margin-bottom:12px;">
+        <button id="fetchWeatherButton" class="btn btn-success mt-3" style="margin-right: 5px;"><i class="fa fa-refresh"></i>Refresh</button>
+        <button id="readWeatherButton" class="btn btn-info mt-3" style="margin-right: 5px;">Read Weather Aloud</button>
+        <button id="startRecognition" class="btn btn-primary mt-3">Start Speech Recognition</button>
+    </div>
+
+
+    <!-- SEARCH -->
+    <div class="speech-recognition" style="display: flex;align-items: center;border: 1px solid #ccc;padding: 10px;border-radius: 5px;">
+        <p style="margin:0px;  margin-right: 0px;margin-right: 15px;" class="form-label">Ask for weather in a city:   </p>
+        <input type="text" id="speechInput" class="form-control" placeholder="Enter a city name" style="width: 50%;margin-right: 15px;" />
+        <p style="margin:0;">Current Location: @Model.Location.Name, @Model.Location.Country</p>
     </div>
 
     @if (Model.Forecast.ForecastDay.Count() >= 0)
@@ -19,7 +40,7 @@
 
                     <div id="currentWeatherCondition" style=" border-radius: 20px;">
                         <div id="current-condition-header" style="padding: 10px 16px; background-color:#5e5263;  border-radius: 20px 20px 0 0 ;">
-                            <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@ViewBag.City</h1>
+                            <h1 id="current-condition-location" style="display: inline;font-weight: 600;font-size: 1.1rem;color:white;">@location</h1>
                             <span id="current-condition-timestamp" style="font-size: 1.125rem;padding-left: 2px; color:white;">
                                 As of @item.Date
 
@@ -65,5 +86,101 @@
         <p> sorry, no data available</p>
     }
 
+</div>
+
+<script>
+    // Declare a variable to hold the speech recognition object
+    let recognition;
+
+    // Get references to HTML elements by their IDs
+    const speechInput = document.getElementById("speechInput"); // input text
+    const startRecognition = document.getElementById("startRecognition"); // speech button
+
+    // Add a click event listener to the "Start Recognition" button
+    startRecognition.addEventListener("click", () => {
+        // Check if the recognition object is not already initialized
+        if (!recognition) {
+            // Create a new webkitSpeechRecognition object
+            recognition = new webkitSpeechRecognition();
+
+            // Define a callback function to handle recognition results
+            recognition.onresult = (event) => {
+                // Get the recognized speech result
+                const result = event.results[0][0].transcript;
+
+                // Set the recognized result as the value of the input field
+                speechInput.value = result;
+
+                // Call a function to fetch current weather for the recognized city
+                fetchCurrentWeather(result);
+            };
+        }
+
+        // Start the speech recognition
+        recognition.start();
+    });
+
+    // Add a click event listener to the "Read Weather" button
+    document.getElementById("readWeatherButton").addEventListener("click", function () {
+        // Extract model data into JavaScript variables (assumes this is Razor syntax)
+        var temperatureC = '@Model.Current.TemperatureC';
+        var conditionText = '@(Model.Current.Condition?.Text ?? "not available")';
+
+        // Construct the weather text to be read
+        var weatherText = `Current temperature is ${temperatureC} degrees Celsius.
+                                            The weather condition is ${conditionText}.`;
+
+        console.log(weatherText);
+        // Call the speak function to read the weather text aloud
+        speak(weatherText);
+    });
+
+    // Function to fetch current weather for a given city
+    function fetchCurrentWeather(city) {
+        // Redirect to the Weather/Index action with the user's input as a query parameter
+        window.location.href = `/Weather/GetMultipleDayForecast?city=${city}`;
+    }
+
+    // Function to speak the provided text
+    function speak(text) {
+        // Create a SpeechSynthesisUtterance object
+        const speech = new SpeechSynthesisUtterance();
+
+        // Set the text to be spoken
+        speech.text = text;
+
+        // Set the language for speech synthesis (English - US)
+        speech.lang = 'en-US';
+
+        // Set the pitch and rate of speech
+        speech.pitch = 1;
+        speech.rate = 1;
+
+        // Start the speech synthesis
+        window.speechSynthesis.speak(speech);
+    }
 
 
+    //REFRESH / FETCH BUTTON EVENT
+    document.getElementById("fetchWeatherButton").addEventListener("click", function () {
+        let city = document.getElementById("searchForecastInput").value;
+        if (city == '') {
+
+            const url = window.location.search; // 'https://localhost:7293/Weather/Index?city=bali';
+            city = getQueryParam(url, 'city');
+        }
+        window.location.href = `/Weather/Tomorrow?city=${city}`;
+       
+    });
+
+    //returns querystring value when passed querystring key
+    function getQueryParam(url, parameterName) {
+        const queryString = url.split('?')[1];
+        if (!queryString) return null;
+
+        const urlParams = new URLSearchParams(queryString);
+        return urlParams.get(parameterName);
+    }
+
+
+</script>
